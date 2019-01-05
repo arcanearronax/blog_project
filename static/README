@@ -1,0 +1,55 @@
+This is going to be a small website that will give me a way to build up and track progress with different subjects.
+
+Make a website
+    Make regular posts to it
+    Add a section for math
+		Project Euler
+		Koch Curve
+    Add a section for physics
+		Build some models
+    Add a section for hobbies
+        Pokemon Purple stuff
+			Research approach
+				https://github.com/pret/pokeyellow
+				This repo will help to automate building yellow
+			Identify what's being changed
+				Identify how it's being changed
+			Include 
+        Cat stuff
+		Streaming Stuff
+		Videogames - stats or something
+    Add a section for programming
+        Blackjack Game
+			Retest/restructure the classes
+			Rebuild the script to play
+			Clear out the bugs
+		Build REST API
+			Use it to create/update pages
+			Integrate this into Nginx
+			Use this to make updates to the website
+			Use the API to track bug reports
+		Pi and System Build scripts
+			Fix these up and give a purpose
+		Project Euler
+			Select problems that show off stuff
+		Koch Curve Generator
+			Fix up the python number classes
+			Rebuild the Line segment classes to use number classes
+			Rebuild generator to use custom classes and methods
+
+Fuck it, LEMP Stack again
+	Build a MySQL database to support dynamic page generation
+		Build a table that contains basic info for each subpage
+		Build a table to support different post types
+	Configure NGINX to support PHP dynamic generation
+		Not sure what will need to be done here...
+	Build up PHP scripts to push/pull info with the database
+		Calculate info to display on the homepage
+		Pull info from tables to build the subpages
+	Build HTML pages to outline the website structure
+		Build the homepage
+		Build template subpages
+			Lyx Support
+			Some type of support for physics modeling
+			Support for displaying code
+			Support for running code in virtual terminal

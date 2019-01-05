@@ -1,0 +1,178 @@
+Rebuilding Pi
+
+0. Rebuild Pi
+	0.0 Prepare the micro sd card
+		# Format the micro sd card (do not create a new partition)
+		sudo dd bs=4M if=/dev/zero of=/dev/mmcblk0
+		sudo dd bs=4M if=/home/arronax/Downloads/2018-06-27-raspbian-stretch.img of=/dev/mmcblk0
+		Eject and reinsert the micro sd card
+		sudo mkdir /run/media/arronax/boot
+		sudo mount /dev/mmcblk0p1 /run/media/arronax/boot
+		sudo touch /run/media/arronax/boot/ssh
+		sudo umount /run/media/arronax/boot
+		Eject the micro sd card
+	0.1 Expand Filesystem
+		# SSH into the pi using the pi account
+		sudo raspi-config
+		# Advanced Options -> Expand Filesystem -> Ok -> Finish -> Yes
+	0.2 Create My Account
+		# SSH into the pi again
+		sudo adduser arronax
+		sudo adduser arronax sudo
+		sudo passwd pi	
+		exit
+	0.3 Update the pi
+		# SSH into the pi as my user
+		sudo apt-get update -y
+		sudo apt-get upgrade -y
+		sudo reboot now
+	0.4 Install Vim
+		sudo apt-get install vim -y
+		0.4.0 Configure Vim
+			echo 'set tabstop=4' >> ~/.vimrc
+			echo 'set softtabstop=0 noexpandtab' >> ~/.vimrc
+			echo 'set shiftwidth=4' >> ~/.vimrc
+			echo 'syntax on' >> ~/.vimrc
+
+1. Install UFW
+	sudo apt-get install ufw -y
+	sudo ufw allow ssh
+	sudo ufw allow http
+	sudo ufw allow https
+	sudo ufw enable
+	sudo service ufw start
+
+
+2. Create Webmaster Account
+	sudo adduser webmaster
+	sudo adduser webmaster sudo
+
+
+3. Setup Nginx
+	sudo apt-get install nginx
+	sudo adduser webmaster www-data
+	3.0 Update Nginx Config
+		Change user to webmaster
+	3.1 Modify the sites-available config file (if needed)
+	3.2 Start and verify the server is running
+
+4. Setup Postgres
+	sudo apt-get install postgresql libpq-dev postgresql-client postgresql-client-common -y
+	4.0 Configure User and Database
+		sudo -iu postgres (switch to postgres user)
+		createuser [username] -P --interactive (create webmaster db user, super)
+		psql (start a connection to the db)
+		alter role webmaster set client_encoding to 'utf-8';
+		alter role webmaster set default_transaction_isolation to 'read committed';
+		alter role webmaster set timezone to 'EST';
+		create database webmaster;
+		grant all privileges on database webmaster to webmaster;
+		ctrl+D (logout of the db)
+		ctrl+D (logout of the postgres user)
+	4.1 Modify Postgres Config
+		# /etc/postgresql/9.6/main/
+		# Set log_timezone = 'EST'
+		# Set timezone = 'EST'
+		# Enable listen_addresses = '*'
+		sudo service postgresql restart
+
+4. Setup Python3
+	### Python 3.5.3 and Pip3 are installed by default
+	4.0 Setup Virtual Environment
+		sudo -H pip3 install virtualenv
+	4.1. Create Virtual Environment
+		# Logged in as webmaster
+		mkdir ~/virtualenv
+		cd ~/virtualenv
+		virtualenv web_proj
+	4.2. Configure Virtual Environment
+		source ~/virtualenv/web_proj/bin/activate
+		pip3 install django gunicorn psycopg2
+		django-admin.py startproject first_proj ~/virtualenv/web_proj
+	4.3. Adjust Project Settings
+		# Set ALLOWED_HOSTS = ['192.168.0.2']
+		# Set DATABASES['default']['ENGINE']: 'django.db.backends.postgresql_psycopg2',
+		# Set DATABASES['default']['NAME']: 'first_proj',
+		# Set DATABASES['default']['USER']: 'webmaster',
+		# Set DATABASES['default']['PASSWORD']: '[password]',
+		# Set DATABASES['default']['HOST']: 'localhost',
+		# Set DATABASES['default']['PORT']: '',
+		echo 'STATIC_ROOT = os.path.join(BASE_DIR, \'static/\')' >> ~/virtualenv/web_proj/first_proj/settings.py
+	4.4 Migrate the initial database schema to Postgres
+		4.4.0 Create first_proj Database
+			psql
+			create database first_proj
+			ctrl+D
+		~/virtualenv/web_proj/manage.py makemigrations
+		~/virtualenv/web_proj/manage.py migrate
+		4.4.1 Create admin user for project
+			<enter>
+			<enter>
+			[password]
+			[password]
+	4.5 Setup stuff for gunicorn
+		cd ~/virtualenv/web_proj
+		gunicorn --bind 0.0.0.0:8000 first_proj.wsgi
+		# ctrl+C if loads without issue
+		deactivate
+		4.5.0. Create a Gunicorn systemd service file
+			#sudo vi /etc/systemd/system/first_proj.service			
+			#sudo echo '[Unit]' > /etc/systemd/system/first_proj.service
+			#sudo echo 'Description=first_proj daemon' >> /etc/systemd/system/first_proj.service			
+			#sudo echo 'After=network.target' >> /etc/systemd/system/first_proj.service
+			#sudo echo '\n' >> /etc/systemd/system/first_proj.service
+			#sudo echo '[Service]' >> /etc/systemd/system/first_proj.service
+			#sudo echo 'User=webmaster' >> /etc/systemd/system/first_proj.service
+			#sudo echo 'Group=www-data' >> /etc/systemd/system/first_proj.service
+			#sudo echo 'WorkingDirectory=/home/webmaster/virtualenv/' >> /etc/systemd/system/first_proj.service
+			#sudo echo 'ExecStart=/home/webmaster/virtualenv/web_proj/bin/gunicorn --access-logfile - --workers 3 --bind unix:/home/webmaster/virtualenv/web_proj/first_proj/first_proj.sock first_proj.wsgi:application' >> /etc/systemd/system/first_proj.service
+			#sudo echo '\n' >> /etc/systemd/system/first_proj.service
+			#sudo echo '[Install]' >> /etc/systemd/system/first_proj.service
+			#sudo echo 'WantedBy=multi-user.target' >> /etc/systemd/system/first_proj.service
+			sudo vi /etc/systemd/system/gunicorn.service
+			sudo echo '[Unit]' > /etc/systemd/system/gunicorn.service
+			sudo echo 'Description=gunicorn daemon' >> /etc/systemd/system/gunicorn.service
+			sudo echo 'After=network.target' >> /etc/systemd/system/gunicorn.service
+			sudo echo '\n' >> /etc/systemd/system/gunicorn.service
+			sudo echo '[Service]' >> /etc/systemd/system/gunicorn.service
+			sudo echo 'User=webmaster' >> /etc/systemd/system/gunicorn.service
+			sudo echo 'Group=www-data' >> /etc/systemd/system/gunicorn.service
+			sudo echo 'WorkingDirectory=/home/webmaster/virtualenv/' >> /etc/systemd/system/gunicorn.service
+			sudo echo 'ExecStart=/home/webmaster/virtualenv/web_proj/bin/gunicorn --access-logfile - --workers 3 --bind unix:/home/webmaster/virtualenv/web_proj/first_proj/first_proj.sock first_proj.wsgi:application' >> /etc/systemd/system/gunicorn.service
+			sudo echo '\n' >> /etc/systemd/system/gunicorn.service
+			sudo echo '[Install]' >> /etc/systemd/system/gunicorn.service
+			sudo echo 'WantedBy=multi-user.target' >> /etc/systemd/system/gunicorn.service
+		4.5.1 Activate Gunicorn Service
+			sudo systemctl start gunicorn
+			sudo systemctl enable gunicorn
+			# Check sudo systemctl status gunicorn
+	deactivate
+
+5. Configure Nginx to Proxy Pass to Gunicorn
+	sudo vi /etc/nginx/sites-available/[proj_name]
+	5.0 Create first_proj site config file
+		sudo vi /etc/nginx/sites-available/first_proj
+		#	server
+		#		listen 80;
+		#		server_name 192.168.0.2;
+		#
+		#		location = /favicon.ico { access_log off; log_not_found off; }
+		#		location /static/ {
+		#			root /home/webmaster/virtualenv/web_proj/first_proj;
+		#		}
+		#
+		#		location / {
+		#			include proxy_params;
+		#			proxy_pass http://unix:/home/webmaster/virtualenv/web_proj/first_proj/first_proj.sock;
+		#		}
+		#	}
+		sudo ln -s /etc/nginx/sites-available/first_proj /etc/nginx/site-enabled
+		sudo nginx -t 	  
+		sudo systemctl restart nginx
+
+
+
+
+### Below Here are Additional Items Being Tested ###
+
+

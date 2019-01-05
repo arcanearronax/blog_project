@@ -1,0 +1,76 @@
+UFW
+	Commands:
+		Start Firewall: sudo service ufw start
+		Allow Port: sudo ufw allow [port#]
+		Enable Firewall: sudo ufw enable
+		List Rules: sudo ufw status numbered
+		Delete Rule: sudo ufw delete [rule#]
+		Disable Firewall: sudo ufw disable
+		Reset All Rules: sudo ufw reset
+		Check Status: sudo service ufw status
+		Kill Firewall: sudo service ufw stop
+		
+	Requirements:
+		
+Nginx
+	Commands:
+		Start Server: sudo service nginx start
+		Kill Server: sudo service nginx stop
+		Relod Config: sudo service nginx reload
+
+	Requirements:
+		Ensure user is member of www-data
+		A site will only be hosted if there is a host file in sites-available and it's linked in sites-enabled
+	Structure:
+		Install Dir: /etc/nginx
+		Primary Config: /etc/nginx/nginx.conf
+			Directive = Config option
+			Directives are organized in blocks/contexts
+			Events block (?) and HTTP Block
+			Http block contains directives for http traffic
+			listen directive tells nginx the hostname/ip and tcp port where it should listen for connections
+			server_name directive allows multiple sites to be served
+			location block tells nginx how to respond to requests for different resources
+		Site Config Files: /etc/nginx/sites-available
+		Figure Out: /etc/nginx/conf.d
+		Default Root Dir: /var/www/html
+		Log Dir: /var/log/nginx
+		Default Site: default
+		Public Site: 
+
+Postgres
+	Commands:
+		Create DB: create database [db_name];
+		Grant privs: grant all privileges on database [db_name] to [user_name];
+		Show Databases: \list
+		Show Tables: \dt
+	Requirements:
+		Installing the db creates a postgres user account
+		To access tables, use psql [db_name]
+	Structure:
+
+Python Virtual Environment
+	Commands:
+		Enter VirtEnv: source ~/web_proj/first_proj/bin/activate
+		Exit VirtEnv: deactivate
+	Requirements:
+
+	Structure:
+
+Gunicorn
+	Commands:
+		Check Status: sudo systemctl status gunicorn
+		Reload Daemon: sudo systemctl daemon-reload
+		Restart Daemon: sudo systemctl restart gunicorn
+	Requirements:
+
+	Structure:
+		pass gunicorn a module by specifying a rel dir path in django's wsgi.py
+
+Django
+	first_proj/views.py
+		Linked to a uri via urls.py
+		Returns an HTTP response
+	first_proj/settings.py
+		Identifies 
+

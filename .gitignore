@@ -1,2 +1,3 @@
 blog/settings.py
 blog/__pycache__
+blog/migrations
