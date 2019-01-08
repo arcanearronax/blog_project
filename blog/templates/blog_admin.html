@@ -2,7 +2,7 @@
 
 <html>
 
-	<title>{{ post.title }}</title>
+	<title>Blog Admin</title>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
@@ -43,6 +43,12 @@
 		.pri {
 			z-index: 1;
 		}
+
+		.horizontal-gap {
+			float: left;
+			margin-left: 20px;
+		}
+
 	</style>
 
 	<head>
@@ -50,23 +56,45 @@
 	</head>
 
 	<body class="w3-black">
-		<div class="left-div w3-third w3-dark-grey">
-			<h3>Post Information:</h3>
-			<li>Date Posted:</li>
-			<li>&emsp;{{ post.pub_date }}</li>
 
-			<p>{{ cat_desc }}</p>
+    <!-- This is the sidebar on the left -->
+		<div class="left-div w3-third w3-dark-grey">
+			<h3>Categories Available:</h3>
+
+      {% for cat_desc in cat_descs %}
+        <li><a href="/blog/{{ cat_desc }}/">{{ cat_desc }}</a></li>
+      {% empty %}
+        <li>Something broke...</li>
+      {% endfor %}
+
 		</div>
 
 		<!--This is the main part of the page-->
-		<div>
-			{% if post %}
-				<h2>{{ post.title }}</h2>
-				<p>{{ post.text }}</p>
-				<hr>
-			{% else %}
-				<p>Post Not Found</p>
-			{% endif %}
+		<div class="horizontal-gap">
+			<h2>"Secret" Admin Page</h2>
+			<br>
+      <p>Hey, something's here.</p>
+
+			<br>
+			<br>
+
+			<h3>Submit a new post:</h3>
+			{% block content %}
+			<form method="Post" class="post-form"> {% csrf_token %}
+				Post Title:<br>
+				<input type="text" name="title"><br>
+				Category:<br>
+				<select name="cat_desc">
+						<option/>
+					{% for cat_desc in cat_descs %}
+						<option value='"' + {{ cat_desc }} + '"'>{{ cat_desc }}</option>
+					{% endfor %}
+				</select>
+				Post Body:<br>
+				<textarea type="text" name="desc">Type body here...</textarea><br>
+				<input type="submit" value="Submit">
+			</form>
+			{% endblock %}
 		</div>
 	</body>
 </html>

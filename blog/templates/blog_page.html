@@ -63,7 +63,7 @@
 					<h3>Recent {{ desc }} Posts:</h3>
 					<ul>
 						{% for post in posts %}
-							<li><a href="/blog/{{ cat_desc }}/{{ post.id }}/">{{ post.title }}</a></li>
+							<li><a href="/blog/{{ desc }}/{{ post.id }}/">{{ post.title }}</a></li>
 						{% empty %}
 							<li> NO POSTS AVAILABLE</li>
 						{% endfor %}
