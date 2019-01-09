@@ -71,6 +71,7 @@
 
 		<!--This is the main part of the page-->
 		<div class="horizontal-gap">
+
 			<h2>"Secret" Admin Page</h2>
 			<br>
       <p>Hey, something's here.</p>
@@ -79,10 +80,14 @@
 			<br>
 
 			<h3>Submit a new post:</h3>
+
 			{% block content %}
+
 			<form method="Post" class="post-form"> {% csrf_token %}
+
 				Post Title:<br>
 				<input type="text" name="title"><br>
+
 				Category:<br>
 				<select name="cat_desc">
 						<option/>
@@ -90,11 +95,16 @@
 						<option value='"' + {{ cat_desc }} + '"'>{{ cat_desc }}</option>
 					{% endfor %}
 				</select>
+
 				Post Body:<br>
 				<textarea type="text" name="desc">Type body here...</textarea><br>
-				<input type="submit" value="Submit">
+
+				<input type="submit" value="OK">
+
 			</form>
+
 			{% endblock %}
+
 		</div>
 	</body>
 </html>
