@@ -83,23 +83,11 @@
 
 			{% block content %}
 
-			<form method="Post" class="post-form"> {% csrf_token %}
+			<form method="POST" class="post-form">
 
-				Post Title:<br>
-				<input type="text" name="title"><br>
-
-				Category:<br>
-				<select name="cat_desc">
-						<option/>
-					{% for cat_desc in cat_descs %}
-						<option value='"' + {{ cat_desc }} + '"'>{{ cat_desc }}</option>
-					{% endfor %}
-				</select>
-
-				Post Body:<br>
-				<textarea type="text" name="desc">Type body here...</textarea><br>
-
-				<input type="submit" value="OK">
+				{% csrf_token %}
+				{{ form }}
+				<input type="submit" value="Submit">
 
 			</form>
 

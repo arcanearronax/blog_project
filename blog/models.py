@@ -7,6 +7,8 @@ class Category(models.Model):
 	def __str__(self):
 		return self.desc
 
+	
+
 class Post(models.Model):
 	id = models.IntegerField(primary_key=True)
 	cat = models.ForeignKey(Category, on_delete=models.CASCADE, default=0)

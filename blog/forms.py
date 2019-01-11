@@ -1,7 +1,8 @@
 from django import forms
-from .models import Post
+from .models import Post, Category
 
 class PostForm(forms.ModelForm):
     class Meta:
         model = Post
-        fields = ('cat','title','text',)
+        #choices = forms.ModelMultipleChoiceField(queryset=Category.objects.all())
+        fields = ('title','cat','text',)

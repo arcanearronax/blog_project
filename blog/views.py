@@ -22,6 +22,13 @@ def index(request):
 	}
 	return HttpResponse(template.render(context, request))
 
+def debugPage(request, title):
+	template = loader.get_template('debug_page.html')
+	context = {
+		'title': title,
+	}
+	return HttpResponse(template.render(context, request))
+
 def blogAdmin(request):
 	logger.info('Enter blogAdmin')
 
@@ -31,22 +38,31 @@ def blogAdmin(request):
 		form = PostForm(request.POST)
 
 		if form.is_valid():
-			blogpost = form.save(commit=False)
-			blogpost.title = request.title
-			blogpost.cat = get_object_or_404(Category, desc=request.cat_desc).id
-			blogpost.text = request.desc
-			blogpost.save()
+			post = form.save(commit=False)
+			post.title = request.POST.get('title')
+			post.cat = get_object_or_404(Category, pk=int(request.POST.get('cat')))
+			post.text = request.POST.get('text')
 
-			return redirect('blogPostById', cat_desc=request.cat_desc, id=blogpost.pk)
-		else:
+			post.id = Post.objects.count() + 1
+
+			post.save()
+			return redirect('')
+
+			#return redirect('blogPostById', cat_desc=request.cat_desc, id=post.pk)
+			#return HttpResponse(loader.get_template({'title': 'SUCCESS',}, request))
+			#return debugPage(request, 'OOPS')
+		#else:
 			#return redirect('../error')
-			print(form.errors)
-			return HttpResponse(escape(repr(request)))
+			#print(form.errors)
+			#return debugPage(request, form.errors)
+
+	form = PostForm()
 
 	template = loader.get_template('blog_admin.html')
 	cat_descs = Category.objects.order_by('id')
 	context = {
 		'cat_descs': cat_descs,
+		'form': form,
 	}
 	return HttpResponse(template.render(context, request))
 
