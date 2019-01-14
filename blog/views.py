@@ -1,7 +1,7 @@
 from django.http import HttpResponse
 from django.template import loader
 from django.shortcuts import get_object_or_404
-from django.shortcuts import redirect
+from django.shortcuts import redirect, reverse
 from .models import *
 from .forms import PostForm
 import logging
@@ -46,7 +46,7 @@ def blogAdmin(request):
 			post.id = Post.objects.count() + 1
 
 			post.save()
-			return redirect('')
+			return redirect('/blog/{}/{}'.format(post.cat.desc, post.id))
 
 			#return redirect('blogPostById', cat_desc=request.cat_desc, id=post.pk)
 			#return HttpResponse(loader.get_template({'title': 'SUCCESS',}, request))
@@ -71,21 +71,23 @@ def blogPost(request, cat_desc, id):
 	post = get_object_or_404(Post, pk=id)
 	# Get the info for other posts
 	cat_desc = get_object_or_404(Category, pk=post.cat_id)
-	recent = get_object_or_404(Post, cat=post.cat_id)
+	recent = Post.objects.filter(cat=post.cat_id)
 	template = loader.get_template('blog_post.html')
+	cnt = recent.count()
 	context = {
 		'post': post,
 		'desc': cat_desc,
+		'cnt': cnt,
 		'recent_posts': recent[:5],
 	}
 	return HttpResponse(template.render(context, request))
 
 def categoryHome(request, desc):
-	if (desc == 'admin'):
-		return blogAdmin(request)
+	#if (desc == 'admin'):
+	#	return blogAdmin(request)
 	id = get_object_or_404(Category, desc=desc).id
 	posts = Post.objects.filter(cat=id).order_by('pub_date')
-	cnt = 2
+	cnt = posts.count()
 	template = loader.get_template('blog_page.html')
 	context = {
 		'posts': posts[:5],
@@ -109,3 +111,16 @@ def newPost(request):
 
 def blogError(request):
 	return HttpResponse('You got an error.')
+
+def blogHome(request):
+	categories = Category.objects.order_by('id')
+	template = loader.get_template('blog_home.html')
+
+	context = {
+		'categories': categories
+	}
+
+	return HttpResponse(template.render(context, request))
+
+def blogLogin(request):
+	return HttpResponse('Do this later.')

@@ -19,11 +19,12 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-	path('blog/<slug:desc>/', views.categoryHome, name='categoryHome'),
     # Need to figure out 'overloading paths' here to make this work
-    path('blog/admin', views.blogAdmin, name='blogAdmin'),
-    path('blog/error', views.blogError, name='blogError'),
-    path('blog/new', views.newPost, name='newPost'),
+    path('blog/', views.blogHome, name='blogHome'),
+    path('blog/login/', views.blogLogin, name='blogLogin')
+    path('blog/admin/', views.blogAdmin, name='blogAdmin'),
+    path('blog/error/', views.blogError, name='blogError'),
+	path('blog/<slug:desc>/', views.categoryHome, name='categoryHome'),
     path('blog/<slug:cat_desc>/admin', views.categoryAdmin, name='categoryAdmin'),
 	path('blog/<slug:cat_desc>/<int:id>/', views.blogPost, name='blogPost'),
 ]
