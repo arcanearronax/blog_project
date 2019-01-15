@@ -116,8 +116,17 @@ def blogHome(request):
 	categories = Category.objects.order_by('id')
 	template = loader.get_template('blog_home.html')
 
+	posts = Post.objects.order_by('-pub_date')
+
+	recent_posts = [(post, categories.get(pk=post.cat.id)) for post in posts[:5]]
+
+	cnt = posts.count()
+
 	context = {
-		'categories': categories
+		'cnt': cnt,
+		'recent_posts': recent_posts,
+		'cats': categories,
+		'categories': categories,
 	}
 
 	return HttpResponse(template.render(context, request))
