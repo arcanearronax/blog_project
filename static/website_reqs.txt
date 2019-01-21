@@ -1,7 +1,0 @@
-1. Figure out what to use for these:
-	a. Database		- Postgres
-	b. Web Server	- Nginx
-	c. Framework	- Django
-	d. REST API
-	
-	
