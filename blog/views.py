@@ -83,8 +83,6 @@ def blogPost(request, cat_desc, id):
 	return HttpResponse(template.render(context, request))
 
 def categoryHome(request, desc):
-	#if (desc == 'admin'):
-	#	return blogAdmin(request)
 	id = get_object_or_404(Category, desc=desc).id
 	posts = Post.objects.filter(cat=id).order_by('pub_date')
 	cnt = posts.count()

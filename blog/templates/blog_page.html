@@ -13,10 +13,10 @@
 		.w3-row-padding img {margin-bottom: 12px}
 
 		/* Set the width of the sidebar to 120px */
-		.w3-sidebar {width: 100px;background: #222;}
+		.w3-sidebar {width: 150px;background: #222;}
 
 		/* Add a left margin to the "page content" that matches the width of the sidebar (120px) */
-		#main {margin-left: 120px}
+		#main {margin-left: 240px}
 
 		/* Remove margins from "page content" on small screens */
 		@media only screen and (max-width: 600px) {#main {margin-left: 0}}
@@ -55,34 +55,40 @@
 		<!-- Use this to group the divs side by side -->
 		<div class="container">
 			<!-- Different Blog Posts in the Category -->
-			<div class="left-div w3-quarter w3-dark-grey">
-				<div>
-					<h4>Total Posts: {{ cnt }}</h4>
-					<br>
+			<div class="w3-sidebar w3-bar-block w3-dark-grey">
 
-					<h3>Recent {{ desc }} Posts:</h3>
-					<ul>
-						{% for post in posts %}
-							<li><a href="/blog/{{ desc }}/{{ post.id }}/">{{ post.title }}</a></li>
-						{% empty %}
-							<li> NO POSTS AVAILABLE</li>
-						{% endfor %}
-					</ul>
-				</div>
+				<!-- Insert physics image here -->
+
+				<p>Total Posts: {{ cnt }}</p>
+
+				<p>Recent {{ desc }} Posts:</p>
+
+				{% for post in posts %}
+					<a href="/blog/{{ desc }}/{{ post.id }}/" class="w3-padding-large">
+						<i class="fa w3-xxlarge"></i>
+						<p class="w3-black">{{ post.title }}</p>
+					</a>
+				{% empty %}
+					<p> NO POSTS AVAILABLE</p>
+				{% endfor %}
 			</div>
 
 			<!-- Most Recent Post -->
-			<div class="center-div w3-half">
-				<h2>Post Title: {{ posts.0.title }}</h2>
-				<h6>Post Date: {{ posts.0.pub_date }}</h6>
-				<br>
-				<p>{{ posts.0.text }}</p>
-			</div>
-		</div>
+			<div class="w3-padding-large" id="main">
+				<div class="w3-content w3-justify w3-padding-64">
+					<h2>Post Title: {{ posts.0.title }}</h2>
+					<h6>Post Date: {{ posts.0.pub_date }}</h6>
+					<br>
+					<p>{{ posts.0.text }}</p>
+				</div>
 
-		<footer>
-			Return to <a href="../../blog/home/">blog hompage</a>
-		</footer>
+				<footer>
+					Return to <a href="../../blog/home/">blog hompage</a>
+				</footer>
+
+			</div>
+
+		</div>
 
 	</body>
 </html>
