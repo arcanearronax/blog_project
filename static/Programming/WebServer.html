@@ -5,7 +5,7 @@
     This is just the template file for static pages.
   -->
 
-	<title>Programming</title>
+	<title>Web Server</title>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
@@ -35,7 +35,7 @@
 		<nav class="w3-sidebar w3-bar-block w3-small w3-hide-small w3-center">
 
   		<!-- Avatar image in top left corner -->
-  		<img src="/fractal.jpg" style="width:100%">
+  		<img src="/static/fractal.jpg" style="width:100%">
 
   		<a href="#" class="w3-bar-item w3-button w3-padding-large w3-black">
     		<i class="fa fa-home w3-xxlarge"></i>
@@ -44,17 +44,17 @@
 
   		<a href="#about" class="w3-bar-item w3-button w3-padding-large w3-hover-black">
     		<i class="fa fa-user w3-xxlarge"></i>
-    		<p>WHAT'S THIS?</p>
+    		<p>Idea</p>
   		</a>
 
   		<a href="#sections" class="w3-bar-item w3-button w3-padding-large w3-hover-black">
     		<i class="fa fa-eye w3-xxlarge"></i>
-    		<p>SECTIONS</p>
+    		<p>Project</p>
   		</a>
 
   		<a href="#contact" class="w3-bar-item w3-button w3-padding-large w3-hover-black">
     		<i class="fa fa-envelope w3-xxlarge"></i>
-    		<p>CONTACT</p>
+    		<p>Code</p>
   		</a>
 
 		</nav>
@@ -74,31 +74,28 @@
 
 			<!-- Header/Home -->
   		<header class="w3-container w3-padding-32 w3-center w3-black" id="home">
-    		<h1 class="w3-jumbo"><span class="w3-hide-small">Program</span>ming</h1>
+    		<h1 class="w3-jumbo">Web <span class="w3-hide-small">Server</span></h1>
     		<p>Web Server, Raspberry Pi, Project Euler...</p>
     		<!-- https://static.scientificamerican.com/blogs/assets/File/320px-Mandel_zoom_08_satellite_antenna.jpg -->
-    		<img src="/fractal.jpg" alt="fractal" class="w3-image" width="992" height="1108">
+    		<img src="/static/fractal.jpg" alt="fractal" class="w3-image" width="992" height="1108">
   		</header>
 
   		<!-- About Section -->
   		<div class="w3-content w3-justify w3-text-grey w3-padding-64" id="about">
         <h2 class="w3-text-light-grey">What's This?</h2>
         <hr style="width:200px" class="w3-opacity">
-				<p> This are a few projects I've worked on over time. I maintain most of
-						my code on Github (link below). Most of my work is in Python3, Bash,
-						and C++. What I have included here is the work I have completed on
-						my own time. The work I have completed for my employeer has
-						primarily been in PL/SQL and Python3. I have not included that here
-						as it is proprietary information.
-				</p>
-				<br>
-				<p>
-						<a href="https://github.com/arcanearronax">Github</a>
+				<p> Enter Web Server stuff.
+						The web server is what you're connecting to while viewing this
+						website. It has been built using Nginx and Django on a Raspberry Pi.
+						The blog portion of the website is running in a Django virtual
+						environment while the rest of the website is made of static pages
+						served by Nginx. The blog portion is served via Nginx through a
+						Django socket.
 				</p>
 
         <!-- What sections we have with measurement bars -->
 				<div id="sections">
-        	<h3 class="w3-padding-16 w3-text-light-grey">Topics</h3>
+        	<h3 class="w3-padding-16 w3-text-light-grey">Sections</h3>
 				</div>
 
         <p class="w3-wide"><a href="/blog/Programming">Blog</a></p>
@@ -106,17 +103,17 @@
             <div class="w3-dark-grey" style="height:28px;width:95%"></div>
         </div>
 
-        <p class="w3-wide"><a href="/Programming/WebServer.html">Web Server</a></p>
+        <p class="w3-wide"><a href="/static/WebServer.html">Web Server</a></p>
         <div class="w3-white">
             <div class="w3-dark-grey" style="height:28px;width:90%"></div>
         </div>
 
-        <p class="w3-wide"><a href="/Programming/Scripts.html">Scripts</a></p>
+        <p class="w3-wide"><a href="/static/ProjectEuler.html">Project Euler</a></p>
         <div class="w3-white">
             <div class="w3-dark-grey" style="height:28px;width:85%"></div>
         </div>
 
-        <p class="w3-wide"><a href="/Programming/BooksRead.html">Books Read</a></p>
+        <p class="w3-wide"><a href="/static/TerminalApps.html">Terminal Apps</a></p>
         <div class="w3-white">
             <div class="w3-dark-grey" style="height:28px;width:80%"></div>
         </div><br>
