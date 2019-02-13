@@ -85,9 +85,22 @@
 
 			<form method="POST" class="post-form">
 
-				{% csrf_token %}
-				{{ form }}
-				<input type="submit" value="Submit">
+					{% csrf_token %}
+					<!--{{ form }}-->
+					<!--<input type="submit" value="Submit">-->
+
+					<table>
+							{% for field in form %}
+    					<tr>
+       					<td>
+         					{{ field.errors }}
+         					{{ field.label_tag }} {{ field }}
+       					</td>
+    					</tr>
+							{% endfor %}
+					</table>
+
+					<input type="submit" value="Submit">
 
 			</form>
 

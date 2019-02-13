@@ -23,6 +23,12 @@
 
 		/* Remove margins from "page content" on small screens */
 		@media only screen and (max-width: 600px) {#main {margin-left: 0}}
+
+		/* Limit the size of book images down the page. */
+		.book-limit {
+			max-width: 	300px;
+			max-height:	390px;
+		}
 	</style>
 
   <head>
@@ -47,9 +53,9 @@
     		<p>WHAT'S THIS?</p>
   		</a>
 
-  		<a href="#sections" class="w3-bar-item w3-button w3-padding-large w3-hover-black">
+  		<a href="#books" class="w3-bar-item w3-button w3-padding-large w3-hover-black">
     		<i class="fa fa-eye w3-xxlarge"></i>
-    		<p>SECTIONS</p>
+    		<p>BOOKS</p>
   		</a>
 
   		<a href="#contact" class="w3-bar-item w3-button w3-padding-large w3-hover-black">
@@ -64,7 +70,7 @@
   		<div class="w3-bar w3-black w3-opacity w3-hover-opacity-off w3-center w3-small">
     		<a href="#" class="w3-bar-item w3-button" style="width:25% !important">HOME</a>
     		<a href="#about" class="w3-bar-item w3-button" style="width:25% !important">ABOUT</a>
-    		<a href="#sections" class="w3-bar-item w3-button" style="width:25% !important">PHOTOS</a>
+    		<a href="#books" class="w3-bar-item w3-button" style="width:25% !important">PHOTOS</a>
     		<a href="#contact" class="w3-bar-item w3-button" style="width:25% !important">CONTACT</a>
   		</div>
 		</div>
@@ -82,44 +88,80 @@
 
   		<!-- About Section -->
   		<div class="w3-content w3-justify w3-text-grey w3-padding-64" id="about">
-        <h2 class="w3-text-light-grey">What's This?</h2>
-        <hr style="width:200px" class="w3-opacity">
-				<p> This are a few projects I've worked on over time. I maintain most of
-						my code on Github (link below). Most of my work is in Python3, Bash,
-						and C++. What I have included here is the work I have completed on
-						my own time. The work I have completed for my employeer has
-						primarily been in PL/SQL and Python3. I have not included that here
-						as it is proprietary information.
-				</p>
-				<br>
-				<p>
-						<a href="https://github.com/arcanearronax">Github</a>
-				</p>
-
-        <!-- What sections we have with measurement bars -->
-				<div id="sections">
-        	<h3 class="w3-padding-16 w3-text-light-grey">Topics</h3>
+				<div>
+        	<h2 class="w3-text-light-grey">What's This?</h2>
+        	<hr style="width:200px" class="w3-opacity">
+					<p>
+							These are some of the books I've read through regarding programming
+							and other related topics.
+					</p>
 				</div>
 
-        <p class="w3-wide"><a href="/blog/Programming">Blog</a></p>
-        <div class="w3-white">
-            <div class="w3-dark-grey" style="height:28px;width:95%"></div>
-        </div>
+				<img class="book-limit" src="https://www.pearsonhighered.com/assets/bigcovers/0/1/3/2/0132916525.jpg"/>
+				<br>
+				<h2>Structured Computer Organization</h2>
+				<h4>Andrew S. Tanenbaum</h4>
 
-        <p class="w3-wide"><a href="/Programming/WebServer.html">Web Server</a></p>
-        <div class="w3-white">
-            <div class="w3-dark-grey" style="height:28px;width:90%"></div>
-        </div>
+				<p>
+						It's been a while since I read through this book but it's a detailed
+						history of computer technology and computing, dating back to the
+						days of mechanical computers. Tanenbaum walks the reader through the
+						different technological developments (vacuum tubes, transistors,
+						microchips, etc) and explains the impact of the changes, giving an
+						idea of why technology today is as it is.
 
-        <p class="w3-wide"><a href="/Programming/Code.html">Code</a></p>
-        <div class="w3-white">
-            <div class="w3-dark-grey" style="height:28px;width:85%"></div>
-        </div>
+						It has helped me to connect the principals of programming with the
+						underlying fundamentals of computing. The book works through the
+						different components of computers (processors, RAM, PCI lanes, etc)
+						and explains how they interact and developed over time.
+				</p>
 
-        <p class="w3-wide"><a href="/Programming/BooksRead.html">Books Read</a></p>
-        <div class="w3-white">
-            <div class="w3-dark-grey" style="height:28px;width:80%"></div>
-        </div><br>
+				<hr>
+				<img class="book-limit" src="https://images-na.ssl-images-amazon.com/images/I/51lVBVnnqiL._SX218_BO1,204,203,200_QL40_.jpg"/>
+				<br>
+				<h2>Murach's Oracle SQL and PL/SQL</h2>
+				<h4>Joel Murach</h4>
+
+				<p>
+						I have not fully read through this book as a structure change within
+						the company I worked for necessitated a change in my role. My
+						purpose for reading	this was to increase my competency with PL/SQL
+						as this was the	database I developed scripts for.
+
+						The books introduces itself more effectively than a number of other
+						books by simply assuming the reader is working on an established
+						database rather than creating one from scratch. With this in mind it
+						teaches the reader about the different aspects of PL/SQL databases
+						in a way where they can explore, rather than create.
+				</p>
+
+				<hr>
+				<img class="book-limit" src="http://ebook-dl.com/pictures/books/pro-python-2nd-ed-2014-edition-marty-alchin(www.ebook-dl.com)_Large.jpg"/>
+				<br>
+				<h2>Pro Django, 2nd Edition</h2>
+				<h4>Marty Alchin</h4>
+
+				<p>
+						I am currently reading this book. I began reading it as it appeared
+						to be a good introduction to Django from a conceptual perspective
+						rather than a nitty-gritty one. I believe that this approach is
+						better suited to my learning style.
+				</p>
+
+				<hr>
+				<img class="book-limit" src="https://d4rri9bdfuube.cloudfront.net/assets/images/book/large/9780/0721/9780072193145.jpg"/>
+				<br>
+				<h2>Unix Made Easy</h2>
+				<h4>John Muster</h4>
+
+				<p>
+						This is the first computer oriented book I ever sat down and worked
+						through. It is a bit dated, and was even back when I first read it,
+						but most of the information is still highly useful. It functions
+						well as a reference book as it introduces and walks through various
+						UNIX utilities
+				</p>
+				<hr>
 
         <!-- This section counts up how many items are in each section -->
 				<div class="w3-row w3-center w3-padding-16 w3-section w3-light-grey">
