@@ -10,3 +10,16 @@ class PostForm(forms.ModelForm):
         widgets = {
             'text': Textarea(attrs={'cols': 60, 'rows': 15})
         }
+
+class CatForm(forms.ModelForm):
+    class Meta:
+        model = Category
+
+        fields = ('desc','hide',)
+
+        choices = (
+            ('hide', 'True')
+        )
+        widgets = {
+            'hide': forms.CheckboxInput()
+        }

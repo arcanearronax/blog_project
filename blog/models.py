@@ -3,6 +3,7 @@ from django.db import models
 class Category(models.Model):
 	id = models.IntegerField(primary_key=True)
 	desc = models.CharField(max_length=20)
+	hide = models.BooleanField(default=False)
 
 	def __str__(self):
 		return self.desc

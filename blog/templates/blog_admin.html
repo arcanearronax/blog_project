@@ -101,7 +101,45 @@
 					</table>
 
 					<input type="submit" value="Submit">
+				{% csrf_token %}
+					<!--{{ form }}-->
+					<!--<input type="submit" value="Submit">-->
 
+				<table>
+					{% for field in pForm %}
+    			<tr>
+       			<td>
+         			{{ field.errors }}
+         			{{ field.label_tag }} {{ field }}
+       			</td>
+    			</tr>
+					{% endfor %}
+				</table>
+				<input type="submit" value="Submit" name="NewPost">
+			</form>
+
+			<hr>
+			<hr>
+			<hr>
+
+			<form method="POST" class="post-form">
+
+				{% csrf_token %}
+					<!--{{ form }}-->
+					<!--<input type="submit" value="Submit">-->
+
+					<h3>Create a New Category:</h3>
+					<table>
+						{% for field in cForm %}
+    				<tr>
+       				<td>
+         				{{ field.errors }}
+         				{{ field.label_tag }} {{ field }}
+       				</td>
+    				</tr>
+						{% endfor %}
+					</table>
+					<input type="submit" value="Submit" name="NewCategory">
 			</form>
 
 			{% endblock %}
