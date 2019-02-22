@@ -8,6 +8,11 @@ class Category(models.Model):
 	def __str__(self):
 		return self.desc
 
+	def getCategories(hidden=0):
+		if (hidden):
+			return Category.objects.order_by('id')
+		return Category.objects.filter(hide=0).order_by('id')
+
 
 
 class Post(models.Model):
@@ -19,3 +24,12 @@ class Post(models.Model):
 
 	def __str__(self):
 		return self.title
+
+	def getPosts(hidden=0, order='id', reverse=0):
+		assert order in ('id', 'pub_date')
+		if (reverse):
+			order = '-{}'.format(order)
+		if (hidden):
+			return Post.objects.order_by(order)
+		#return Post.objects.filter(hide=0).order_by(order)
+		return Post.objects.exclude(desc=Category.objects.filter(hide=0).values_list('desc',flat=True))
