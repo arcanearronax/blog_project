@@ -9,25 +9,36 @@ from django.utils.html import escape
 
 logger = logging.getLogger(__name__)
 
-def index(request):
-	posts = Post.getPosts(order='pub_date')
-	template = loader.get_template('index.html')
+def blogHome(request):
+	categories = Category.getCategories()
+	template = loader.get_template('blog_home.html')
+
+	#posts = Post.objects.order_by('-pub_date')
+	posts = Post.getPosts(order='pub_date', reverse=1)
+
+	recent_posts = [(post, categories.get(pk=post.cat.id)) for post in posts[:5]]
+
+	cnt = posts.count()
+
 	context = {
-		'posts': posts,
+		'cnt': cnt,
+		'recent_posts': recent_posts,
+		'cats': categories,
+		'categories': categories,
 	}
+
 	return HttpResponse(template.render(context, request))
 
-def debugPage(request, title):
-	template = loader.get_template('debug_page.html')
-	context = {
-		'title': title,
-	}
+def blogLogin(request):
+	template = loader.get_template('blog_login.html')
+	context = {}
 	return HttpResponse(template.render(context, request))
+
+def blogLogout(request):
+	return HttpResponse('Blog Logout Page')
 
 def blogAdmin(request):
 	logger.info('Enter blogAdmin')
-
-	print(request.method)
 
 	if request.method == 'POST':
 
@@ -72,6 +83,22 @@ def blogAdmin(request):
 	}
 	return HttpResponse(template.render(context, request))
 
+def blogError(request):
+	return HttpResponse('You got an error.')
+
+def categoryHome(request, desc):
+	id = get_object_or_404(Category, desc=desc).id
+	posts = Post.objects.filter(cat=id).order_by('pub_date')
+	#posts = Post.getPosts(order='pub_date')
+	cnt = posts.count()
+	template = loader.get_template('blog_page.html')
+	context = {
+		'posts': posts[:5],
+		'cnt': cnt,
+		'desc': desc,
+	}
+	return HttpResponse(template.render(context, request))
+
 def blogPost(request, cat_desc, id):
 	# Get the post we're looking at
 	post = get_object_or_404(Post, pk=id)
@@ -88,22 +115,6 @@ def blogPost(request, cat_desc, id):
 	}
 	return HttpResponse(template.render(context, request))
 
-def categoryHome(request, desc):
-	id = get_object_or_404(Category, desc=desc).id
-	posts = Post.objects.filter(cat=id).order_by('pub_date')
-	#posts = Post.getPosts(order='pub_date')
-	cnt = posts.count()
-	template = loader.get_template('blog_page.html')
-	context = {
-		'posts': posts[:5],
-		'cnt': cnt,
-		'desc': desc,
-	}
-	return HttpResponse(template.render(context, request))
-
-def categoryAdmin(request, desc):
-	return
-
 def newPost(request):
 	form = PostForm(request.post)
 	if (form.isValid()):
@@ -114,28 +125,12 @@ def newPost(request):
 		post.save
 	return redirect('blog_admin.py')
 
-def blogError(request):
-	return HttpResponse('You got an error.')
-
-def blogHome(request):
-	categories = Category.getCategories()
-	template = loader.get_template('blog_home.html')
-
-	#posts = Post.objects.order_by('-pub_date')
-	posts = Post.getPosts(order='pub_date', reverse=1)
-
-	recent_posts = [(post, categories.get(pk=post.cat.id)) for post in posts[:5]]
-
-	cnt = posts.count()
+def blogTest(request):
+	cats = Category.getCategories()
+	template = loader.get_template('base_home.html')
 
 	context = {
-		'cnt': cnt,
-		'recent_posts': recent_posts,
-		'cats': categories,
-		'categories': categories,
+		'cats': cats,
 	}
 
 	return HttpResponse(template.render(context, request))
-
-def blogLogin(request):
-	return HttpResponse('Do this later.')
