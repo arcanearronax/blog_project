@@ -1,0 +1,36 @@
+{% extends 'base_template.html' %}
+
+{% block navbar %}
+  <div class="w3-bar w3-black w3-opacity w3-hover-opacity-off w3-center w3-small">
+    <a href="https://arcanedomain.duckdns.org/" class="w3-bar-item w3-button" style="width:25% !important">HOME</a>
+    <a href="{% url 'blogHome' %}" class="w3-bar-item w3-button" style="width:25% !important">BLOG</a>
+    <a href="{% url 'categoryHome' desc=cat.desc %}" class="w3-bar-item w3-button" style="width:25% !important">{{ cat.desc }}</a>
+    <a href="#" class="w3-bar-item w3-button" style="width:25% !important">TOP</a>
+  </div>
+{% endblock %}
+
+{% block sidebar %}
+  <a href="{% url 'categoryHome' desc=cat.desc %}" class="w3-bar-item w3-button w3-padding-large w3-black">
+    <i class="fa fa-arrow-left w3-xxlarge"></i>
+    <p>{{ cat.desc }}</p>
+  </a>
+{% endblock %}
+
+{% block header %}
+  <header class="w3-container w3-center w3-padding-32 w3-black" id="home">
+    <h1 class="w3-jumbo"><span class="w3-hide-small"></span>{{ cat.desc }}</h1>
+    <p>This is a test</p>
+  </header>
+{% endblock %}
+
+{% block body %}
+  <div class="w3-content w3-justify w3-text-grey w3-padding-64" id="about">
+    {% for post in posts %}
+      <h1>{{ post.title }}</h1>
+      <p>{{ post.text }}</p>
+      <hr>
+    {% empty %}
+      <h1>No Posts</h1>
+    {% endfor %}
+  </div>
+{% endblock %}
