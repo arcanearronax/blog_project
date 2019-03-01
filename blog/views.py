@@ -11,16 +11,18 @@ logger = logging.getLogger(__name__)
 
 def blogHome(request):
 	cats = Category.getCategories()
-	template = loader.get_template('base_home.html')
+	template = loader.get_template('blog_home.html')
+	post = Post.getPosts(id=Post.getPosts().count())
 
 	context = {
 		'cats': cats,
+		'post': post[0],
 	}
 
 	return HttpResponse(template.render(context, request))
 
 def categoryHome(request, desc):
-	template = loader.get_template('base_category.html')
+	template = loader.get_template('blog_category.html')
 
 	cat = get_object_or_404(Category, desc=desc)
 	posts = Post.getPosts(cat=cat)
@@ -32,7 +34,7 @@ def categoryHome(request, desc):
 	return HttpResponse(template.render(context, request))
 
 def blogPost(request, desc, id):
-	template = loader.get_template('base_page.html')
+	template = loader.get_template('blog_post.html')
 
 	cat = get_object_or_404(Category, desc=desc)
 	posts = Post.getPosts(id=id)

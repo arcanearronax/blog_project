@@ -13,8 +13,6 @@ class Category(models.Model):
 			return Category.objects.order_by('id')
 		return Category.objects.filter(hide=0).order_by('id')
 
-
-
 class Post(models.Model):
 	id = models.IntegerField(primary_key=True)
 	cat = models.ForeignKey(Category, on_delete=models.CASCADE, default=0)
@@ -36,9 +34,9 @@ class Post(models.Model):
 			order = '-{}'.format(order)
 
 		if (hidden):
-			posts = Post.objects.filter(cat=Category.objects.filter(hide=hidden))
+			posts = Post.objects.all()
 		else:
-			posts = Post.objects
+			posts = Post.objects.filter(cat__in=Category.objects.filter(hide=0))
 
 		if (cat != -1):
 			posts = posts.filter(cat=cat)
