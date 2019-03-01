@@ -25,11 +25,6 @@ urlpatterns = [
     path('blog/logout/', views.blogLogout, name='blogLogout'),
     path('blog/admin/', views.blogAdmin, name='blogAdmin'),
     path('blog/error/', views.blogError, name='blogError'),
-<<<<<<< HEAD
-    path('blog/test/', views.blogTest, name='blogTest'),
-	path('blog/<slug:desc>/', views.categoryHome, name='categoryHome'),
-	path('blog/<slug:cat_desc>/<int:id>/', views.blogPost, name='blogPost'),
-=======
     path('blog/<slug:desc>/', views.categoryHome, name='categoryHome'),
 	path('blog/<slug:desc>/<int:id>/', views.blogPost, name='blogPost'),
 
