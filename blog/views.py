@@ -43,9 +43,6 @@ def blogPost(request, desc, id):
 	}
 	return HttpResponse(template.render(context, request))
 
-def blogLogout(request):
-	return HttpResponse('Blog Logout Page')
-
 def blogAdmin(request):
 	logger.info('Enter blogAdmin')
 
@@ -83,19 +80,6 @@ def blogAdmin(request):
 	pForm = PostForm()
 	cForm = CatForm()
 
-	template = loader.get_template('blog_admin.html')
-	cat_descs = Category.getCategories(hidden=1)
-	context = {
-		'cat_descs': cat_descs,
-		'pForm': pForm,
-		'cForm': cForm,
-	}
-	return HttpResponse(template.render(context, request))
-
-def blogError(request):
-	return HttpResponse('You got an error.')
-
-def categoryHome(request, desc):
 	template = loader.get_template('blog_admin.html')
 	cat_descs = Category.getCategories(hidden=1)
 	context = {
