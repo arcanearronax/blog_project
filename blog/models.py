@@ -25,16 +25,6 @@ class Post(models.Model):
 	def __str__(self):
 		return self.title
 
-<<<<<<< HEAD
-	def getPosts(hidden=0, order='id', reverse=0):
-		assert order in ('id', 'pub_date')
-		if (reverse):
-			order = '-{}'.format(order)
-		if (hidden):
-			return Post.objects.order_by(order)
-		#return Post.objects.filter(hide=0).order_by(order)
-		return Post.objects.exclude(desc=Category.objects.filter(hide=0).values_list('desc',flat=True))
-=======
 	# Need to fix this up a bit and make it a bit easier to use
 	def getPosts(hidden=0, order='id', reverse=0, num=-1, cat=-1, id=-1):
 		assert order in ('id', 'pub_date')
@@ -54,4 +44,3 @@ class Post(models.Model):
 			posts = posts.filter(cat=cat)
 
 		return posts
->>>>>>> Updated the templates being used to be less clunky and rearranged a fair bit of the code. Need to work on purging stuff that isnt being used and then fix up the admin page and login functionality.

@@ -27,13 +27,4 @@ urlpatterns = [
     path('blog/error/', views.blogError, name='blogError'),
     path('blog/<slug:desc>/', views.categoryHome, name='categoryHome'),
 	path('blog/<slug:desc>/<int:id>/', views.blogPost, name='blogPost'),
-
-    ############################################
-    # Below here is just testing or irrelevant #
-    ############################################
-
-    path('blog/test/', views.blogTest, name='blogTest'),
-    path('blog/test/<slug:desc>/', views.baseCategory, name='baseCategory'),
-    path('blog/test/<slug:desc>/<int:id>/', views.basePage, name='basePage'),
->>>>>>> Updated the templates being used to be less clunky and rearranged a fair bit of the code. Need to work on purging stuff that isnt being used and then fix up the admin page and login functionality.
 ]
