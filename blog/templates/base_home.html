@@ -1,5 +1,12 @@
 {% extends 'base_template.html' %}
 
+<<<<<<< HEAD
+=======
+{% block navbar %}
+  <p>Navbar</p>
+{% endblock %}
+
+>>>>>>> Updated the templates being used to be less clunky and rearranged a fair bit of the code. Need to work on purging stuff that isnt being used and then fix up the admin page and login functionality.
 {% block sidebar %}
   {% for cat in cats %}
     <a href="{% url 'categoryHome' desc=cat.desc %}" class="w3-bar-item w3-button w3-padding-large w3-black">
