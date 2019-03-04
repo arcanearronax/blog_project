@@ -1,9 +1,18 @@
 from django.db import models
 
+icon_choices = (
+	('calculator', 'fa-calculator'),
+	('atom', 'fa-atom'),
+	('computer', 'fa-desktop'),
+	('cat', 'fa-cat'),
+	('default', 'fa-blog'),
+)
+
 class Category(models.Model):
 	id = models.IntegerField(primary_key=True)
 	desc = models.CharField(max_length=20)
 	hide = models.BooleanField(default=False)
+	icon = models.CharField(blank=True,max_length=20,choices=icon_choices)
 
 	def __str__(self):
 		return self.desc
@@ -28,7 +37,7 @@ class Post(models.Model):
 		assert order in ('id', 'pub_date')
 
 		if (id > -1):
-			return Post.objects.filter(id=id)
+			return Post.objects.filter(pk=id)
 
 		if (reverse):
 			order = '-{}'.format(order)

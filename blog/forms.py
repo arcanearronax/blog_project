@@ -1,6 +1,6 @@
 from django import forms
-from django.forms import ModelForm, Textarea
-from .models import Post, Category
+from django.forms import ModelForm, Textarea, Select
+from .models import Post, Category, icon_choices
 
 class PostForm(forms.ModelForm):
     class Meta:
@@ -15,11 +15,12 @@ class CatForm(forms.ModelForm):
     class Meta:
         model = Category
 
-        fields = ('desc','hide',)
+        fields = ('desc','hide','icon',)
 
         choices = (
-            ('hide', 'True')
+            ('hide', 'True',)
         )
         widgets = {
-            'hide': forms.CheckboxInput()
+            'hide': forms.CheckboxInput(),
+            'icon': Select(choices=icon_choices),
         }

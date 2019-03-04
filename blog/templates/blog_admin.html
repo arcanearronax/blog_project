@@ -1,149 +1,104 @@
-<!DOCTYPE html>
+{% extends 'blog_template.html' %}
 
-<html>
+{% block title %}
+  <title>Blog Admin</title>
+{% endblock %}
 
-	<title>Blog Admin</title>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
-	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat">
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+{% block navbar %}
+  <div class="w3-bar w3-black w3-opacity w3-hover-opacity-off w3-center w3-small">
+    <a href="https://arcanedomain.duckdns.org/" class="w3-bar-item w3-button" style="width:25% !important">HOME</a>
+    <a href="{% url 'blogHome' %}" class="w3-bar-item w3-button" style="width:25% !important">BLOG</a>
+    <a href="{% url 'blogPost' desc=post.cat id=post.id %}" class="w3-bar-item w3-button" style="width:25% !important">Recent Post</a>
+    <a href="#" class="w3-bar-item w3-button" style="width:25% !important">TOP</a>
+  </div>
+{% endblock %}
 
-	<style>
-		.w3-row-padding img {margin-bottom: 12px}
+<!-- Need to update this to function as labeled -->
+{% block sidebar %}
+	<a href="{% url 'blogPost' desc=post.cat id=post.id %}" class="w3-bar-item w3-button w3-padding-large w3-black">
+		<i class="fa fa-arrow-right w3-xxlarge"></i>
+		<p>New Post</p>
+	</a>
 
-		/* Set the width of the sidebar to 120px */
-		.w3-sidebar {width: 100px;background: #222;height: 100%}
+	<a href="{% url 'blogPost' desc=post.cat id=post.id %}" class="w3-bar-item w3-button w3-padding-large w3-black">
+		<i class="fa fa-arrow-right w3-xxlarge"></i>
+		<p>Edit Post</p>
+	</a>
 
-		/* Add a left margin to the "page content" that matches the width of the sidebar (120px) */
-		#main {margin-left: 120px}
+	<a href="{% url 'blogPost' desc=post.cat id=post.id %}" class="w3-bar-item w3-button w3-padding-large w3-black">
+		<i class="fa fa-arrow-right w3-xxlarge"></i>
+		<p>New Category</p>
+	</a>
 
-		/* Remove margins from "page content" on small screens */
-		@media only screen and (max-width: 600px) {#main {margin-left: 0}}
+	<a href="{% url 'blogPost' desc=post.cat id=post.id %}" class="w3-bar-item w3-button w3-padding-large w3-black">
+		<i class="fa fa-arrow-right w3-xxlarge"></i>
+		<p>Edit Category</p>
+	</a>
 
-		/* Need this to center the latest post's div*/
-		.center-div {
-			margin: 0 auto;
-			border-radius: 3px;
-			padding: 10px;
-			flex-grow: 1;
-		}
+{% endblock %}
 
-		.left-div {
-			width: 200px;
-			flex-flow: column;
-			border-right: 2px solid white;
-		}
+{% block header %}
+  <header class="w3-container w3-center w3-padding-32 w3-black" id="home">
+    <h1 class="w3-jumbo">Blog<span class="w3-hide-small"> Homepage</span></h1>
+    <p>"Secret" Blog Admin Page</p>
+  </header>
+{% endblock %}
 
-		.container {
-			display: flex;
-		}
+{% block body %}
+  <div class="w3-content w3-justify w3-text-grey w3-padding-64" id="about">
+		<h1>Submit a new post:</h1>
 
-		/* Need to give the div priority to be on top */
-		.pri {
-			z-index: 1;
-		}
+		{% block content %}
 
-		.horizontal-gap {
-			float: left;
-			margin-left: 20px;
-		}
+		<form method="POST" class="post-form">
 
-	</style>
-
-	<head>
-		<link rel="stylesheet" type="text/css" href="WebpageStyle.css">
-	</head>
-
-	<body class="w3-black">
-
-    <!-- This is the sidebar on the left -->
-		<div class="left-div w3-third w3-dark-grey">
-			<h3>Categories Available:</h3>
-
-      {% for cat_desc in cat_descs %}
-        <li><a href="/blog/{{ cat_desc }}/">{{ cat_desc }}</a></li>
-      {% empty %}
-        <li>Something broke...</li>
-      {% endfor %}
-
-		</div>
-
-		<!--This is the main part of the page-->
-		<div class="horizontal-gap">
-
-			<h2>"Secret" Admin Page</h2>
-			<br>
-      <p>Hey, something's here.</p>
-
-			<br>
-			<br>
-
-			<h3>Submit a new post:</h3>
-
-			{% block content %}
-
-			<form method="POST" class="post-form">
-
-					{% csrf_token %}
-					<!--{{ form }}-->
-					<!--<input type="submit" value="Submit">-->
-
-					<table>
-							{% for field in form %}
-    					<tr>
-       					<td>
-         					{{ field.errors }}
-         					{{ field.label_tag }} {{ field }}
-       					</td>
-    					</tr>
-							{% endfor %}
-					</table>
-
-					<input type="submit" value="Submit">
-				{% csrf_token %}
-					<!--{{ form }}-->
-					<!--<input type="submit" value="Submit">-->
-
+			{% csrf_token %}
 				<table>
-					{% for field in pForm %}
-    			<tr>
-       			<td>
-         			{{ field.errors }}
-         			{{ field.label_tag }} {{ field }}
-       			</td>
-    			</tr>
+						{% for field in form %}
+						<tr>
+							<td>
+								{{ field.errors }}
+								{{ field.label_tag }} {{ field }}
+							</td>
+						</tr>
+						{% endfor %}
+				</table>
+
+				<input type="submit" value="Submit">
+			{% csrf_token %}
+
+			<table>
+				{% for field in pForm %}
+				<tr>
+					<td>
+						{{ field.errors }}
+						{{ field.label_tag }} {{ field }}
+					</td>
+				</tr>
+				{% endfor %}
+			</table>
+			<input type="submit" value="Submit" name="NewPost">
+		</form>
+
+		<hr>
+
+		<form method="POST" class="post-form">
+
+			{% csrf_token %}
+				<h3>Create a New Category:</h3>
+				<table>
+					{% for field in cForm %}
+					<tr>
+						<td>
+							{{ field.errors }}
+							{{ field.label_tag }} {{ field }}
+						</td>
+					</tr>
 					{% endfor %}
 				</table>
-				<input type="submit" value="Submit" name="NewPost">
-			</form>
+				<input type="submit" value="Submit" name="NewCategory">
+		</form>
 
-			<hr>
-			<hr>
-			<hr>
-
-			<form method="POST" class="post-form">
-
-				{% csrf_token %}
-					<!--{{ form }}-->
-					<!--<input type="submit" value="Submit">-->
-
-					<h3>Create a New Category:</h3>
-					<table>
-						{% for field in cForm %}
-    				<tr>
-       				<td>
-         				{{ field.errors }}
-         				{{ field.label_tag }} {{ field }}
-       				</td>
-    				</tr>
-						{% endfor %}
-					</table>
-					<input type="submit" value="Submit" name="NewCategory">
-			</form>
-
-			{% endblock %}
-
-		</div>
-	</body>
-</html>
+		{% endblock %}
+	</div>
+{% endblock %}

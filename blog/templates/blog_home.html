@@ -1,5 +1,9 @@
 {% extends 'blog_template.html' %}
 
+{% block title %}
+  <title>Blog Home</title>
+{% endblock %}
+
 {% block navbar %}
   <div class="w3-bar w3-black w3-opacity w3-hover-opacity-off w3-center w3-small">
     <a href="https://arcanedomain.duckdns.org/" class="w3-bar-item w3-button" style="width:25% !important">HOME</a>
@@ -12,7 +16,7 @@
 {% block sidebar %}
   {% for cat in cats %}
     <a href="{% url 'categoryHome' desc=cat.desc %}" class="w3-bar-item w3-button w3-padding-large w3-black">
-      <i class="fa fa-home w3-xxlarge"></i>
+      <i class="fa {{ cat.icon }} w3-xxlarge"></i>
       <p>{{ cat.desc }}</p>
     </a>
     {% empty %}
@@ -22,18 +26,20 @@
 
 {% block header %}
   <header class="w3-container w3-center w3-padding-32 w3-black" id="home">
-    <h1 class="w3-jumbo"><span class="w3-hide-small">Blog Home</span>page</h1>
-    <p>This is a test</p>
+    <h1 class="w3-jumbo">Blog<span class="w3-hide-small"> Homepage</span></h1>
+    <p>This is the {{ cat.desc }} Blog</p>
   </header>
 {% endblock %}
 
 {% block body %}
-  <h3>Blog Categories</h3>
-  <ul>
-    {% for cat in cats %}
-      <li>{{ cat.desc }}</li>
-    {% empty %}
-      No Categories
-    {% endfor %}
-  </ul>
+  <div class="w3-content w3-justify w3-text-grey w3-padding-64" id="about">
+    <h1>Blog Categories</h1>
+    <ul>
+      {% for cat in cats %}
+        <li>{{ cat.desc }}</li>
+      {% empty %}
+        No Categories
+      {% endfor %}
+    </ul>
+</div>
 {% endblock %}
