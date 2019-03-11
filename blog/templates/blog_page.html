@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+
+
+<html>
+
+	<title>{{ cat_desc }} Blog Homepage</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+	<style>
+		.w3-row-padding img {margin-bottom: 12px}
+
+		/* Set the width of the sidebar to 120px */
+		.w3-sidebar {width: 150px;background: #222;}
+
+		/* Add a left margin to the "page content" that matches the width of the sidebar (120px) */
+		#main {margin-left: 240px}
+
+		/* Remove margins from "page content" on small screens */
+		@media only screen and (max-width: 600px) {#main {margin-left: 0}}
+
+		/* Need this to center the latest post's div */
+		.center-div {
+			margin: 0 auto;
+  			border-radius: 3px;
+			padding: 10px;
+			flex-grow: 1;
+		}
+
+		.left-div {
+			width: 200px;
+			flex-flow: column;
+			border-right: 2px solid white;
+		}
+
+		.container {
+			display: flex;
+		}
+
+		/* Need to give the div priority to be on top */
+		.pri {
+			z-index: 1;
+		}
+
+	</style>
+
+	<head>
+		<link rel="stylesheet" type="text/css" href="WebpageStyle.css">
+	</head>
+
+	<body class="w3-black">
+
+		<!-- Use this to group the divs side by side -->
+		<div class="container">
+			<!-- Different Blog Posts in the Category -->
+			<div class="w3-sidebar w3-bar-block w3-dark-grey">
+
+				<!-- Insert physics image here -->
+
+				<p>Total Posts: {{ cnt }}</p>
+
+				<p>Recent {{ desc }} Posts:</p>
+
+				{% for post in posts %}
+					<a href="/blog/{{ desc }}/{{ post.id }}/" class="w3-padding-large">
+						<i class="fa w3-xxlarge"></i>
+						<p class="w3-black">{{ post.title }}</p>
+					</a>
+				{% empty %}
+					<p> NO POSTS AVAILABLE</p>
+				{% endfor %}
+			</div>
+
+			<!-- Most Recent Post -->
+			<div class="w3-padding-large" id="main">
+				<div class="w3-content w3-justify w3-padding-64">
+					<h2>Post Title: {{ posts.0.title }}</h2>
+					<h6>Post Date: {{ posts.0.pub_date }}</h6>
+					<br>
+					<p>{{ posts.0.text }}</p>
+				</div>
+
+				<p> Test:
+				</p>
+
+				<footer>
+					Return to <a href="../../blog/home/">blog hompage</a>
+				</footer>
+
+			</div>
+
+		</div>
+	</body>
+</html>

@@ -1,4 +1,4 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.template import loader
 from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect, reverse
@@ -56,19 +56,21 @@ def blogAdmin(request):
 
 	if request.method == 'POST':
 
-		if 'NewPost' in request.POST:
+		if 'PostReq' in request.POST:
 			form = PostForm(request.POST)
 			if form.is_valid():
 				post = form.save(commit=False)
 				post.title = request.POST.get('title')
 				post.cat = get_object_or_404(Category, pk=int(request.POST.get('cat')))
 				post.text = request.POST.get('text')
-				post.id = Post.objects.count() + 1
+				post.id = request.POST.get('post_id')
+				if (post.id == '-1'):
+					post.id = Post.objects.count() + 1
 				post.save()
 				return redirect('/blog/{}/{}'.format(post.cat.desc, post.id))
 			else:
-				return HttpResponse('Invalid Post Form')
-		elif 'NewCategory' in request.POST:
+				return HttpResponse(request.POST.get('title'))
+		elif 'CatReq' in request.POST:
 			form = CatForm(request.POST)
 			if form.is_valid():
 				post = form.save(commit=False)
@@ -81,21 +83,56 @@ def blogAdmin(request):
 					post.hide = True
 				else:
 					post.hide = False
-				post.id = Category.objects.count() + 1
+				post.id = request.POST.get('cat_id')
+				if (post.id == -1):
+					post.id = Category.objects.count() + 1
 				post.save()
 				return redirect('/blog/{}'.format(post.desc))
 			else:
-				return HttpResponse('Invalid Cat Form')
+				return HttpResponse('Fail 1 - {}'.format(request.POST))
 		else:
-			return HttpResponse(request.POST)
-
-	pForm = PostForm()
-	cForm = CatForm()
+			return HttpResponse('Fail 2 - {}'.format(request.POST))
 
 	template = loader.get_template('blog_admin.html')
-	posts = Post.getPosts(id=Post.getPosts().count())
+	cats = Category.getCategories(hidden=1)
+	posts = Post.getPosts(hidden=1)
+
+	pForm = PostForm()
+	pForm.id = -1
+	cForm = CatForm()
+	cForm.id = -1
 
 	context = {
+		'cats': cats,
+		'posts': posts,
+		'pcnt': posts.count(),
+		'ccnt': cats.count(),
+		'post_json': Post.get_json(),
+		'cat_json': Category.get_json(),
+		'pForm': pForm,
+		'cForm': cForm,
+	}
+
+	return HttpResponse(template.render(context, request))
+
+# Using this to test new features
+def blogTest(request):
+	template = loader.get_template('blog_test.html')
+	cats = Category.getCategories(hidden=1)
+	posts = Post.getPosts(hidden=1)
+
+	pForm = PostForm()
+	pForm.id = -1
+	cForm = CatForm()
+	cForm.id = -1
+
+	context = {
+		'cats': cats,
+		'posts': posts,
+		'pcnt': posts.count(),
+		'ccnt': cats.count(),
+		'post_json': Post.get_json(),
+		'cat_json': Category.get_json(),
 		'pForm': pForm,
 		'cForm': cForm,
 		'post': posts[0],

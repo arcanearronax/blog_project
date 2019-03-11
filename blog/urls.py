@@ -15,6 +15,8 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from django.conf import settings
+from django.conf.urls.static import static
 
 from . import views
 
@@ -24,7 +26,8 @@ urlpatterns = [
     path('blog/login/', views.blogLogin, name='blogLogin'),
     path('blog/logout/', views.blogLogout, name='blogLogout'),
     path('blog/admin/', views.blogAdmin, name='blogAdmin'),
+    path('blog/test/', views.blogTest, name='blogTest'),
     path('blog/error/', views.blogError, name='blogError'),
     path('blog/<slug:desc>/', views.categoryHome, name='categoryHome'),
 	path('blog/<slug:desc>/<int:id>/', views.blogPost, name='blogPost'),
-]
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
