@@ -12,11 +12,12 @@ logger = logging.getLogger(__name__)
 def blogHome(request):
 	cats = Category.getCategories()
 	template = loader.get_template('blog_home.html')
-	post = Post.getPosts(id=Post.getPosts().count())
+	Post.getPosts().count()
+	post = Post.getPosts(post_id=Post.getPosts().count())
 
 	context = {
 		'cats': cats,
-		'post': post[0],
+		'post': post,
 	}
 
 	return HttpResponse(template.render(context, request))
@@ -53,9 +54,7 @@ def blogPost(request, desc, id):
 
 def blogAdmin(request):
 	logger.info('Enter blogAdmin')
-
 	if request.method == 'POST':
-
 		if 'PostReq' in request.POST:
 			form = PostForm(request.POST)
 			if form.is_valid():
@@ -63,22 +62,21 @@ def blogAdmin(request):
 				post.title = request.POST.get('title')
 				post.cat = get_object_or_404(Category, pk=int(request.POST.get('cat')))
 				post.text = request.POST.get('text')
-				post.id = request.POST.get('post_id')
-				if (post.id == '-1'):
+				#return HttpResponse(post.cat)
+				try:
+					temp_id = request.POST.get('post_id')
+				except e:
+					#return HttpResponse(e)
 					post.id = Post.objects.count() + 1
 				post.save()
 				return redirect('/blog/{}/{}'.format(post.cat.desc, post.id))
 			else:
-				return HttpResponse(request.POST.get('title'))
+				return HttpResponse(form.errors)
 		elif 'CatReq' in request.POST:
 			form = CatForm(request.POST)
 			if form.is_valid():
 				post = form.save(commit=False)
 				post.desc = request.POST.get('desc')
-				try:
-					post.icon = request.POST.get('icon')[1]
-				except:
-					print('oh well')
 				if (request.POST.get('hide') == 'on'):
 					post.hide = True
 				else:
@@ -135,7 +133,6 @@ def blogTest(request):
 		'cat_json': Category.get_json(),
 		'pForm': pForm,
 		'cForm': cForm,
-		'post': posts[0],
 	}
 	return HttpResponse(template.render(context, request))
 
