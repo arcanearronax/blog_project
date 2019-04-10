@@ -14,6 +14,11 @@
 {% endblock %}
 
 {% block sidebar %}
+
+  <!-- Replace with a blog icon -->
+  <!-- https://www.pexels.com/photo/coffee-notebook-pen-writing-34587/ -->
+  <a href="{% url 'blogHome' %}"><img src="https://images.pexels.com/photos/34587/pexels-photo.jpg?auto=compress&cs=tinysrgb&h=120&w=120" style="width:100%"></a>
+
   <a href="{% url 'categoryHome' desc=cat.desc %}" class="w3-bar-item w3-button w3-padding-large w3-black">
     <i class="fa fa-arrow-left w3-xxlarge"></i>
     <p>{{ cat.desc }}</p>
@@ -29,12 +34,8 @@
 
 {% block body %}
   <div class="w3-content w3-justify w3-text-grey w3-padding-64" id="about">
-    {% for post in posts %}
-      <h1>{{ post.title }}</h1>
-      <p>{{ post.text }}</p>
-      <hr>
-    {% empty %}
-      <h1>No Posts</h1>
-    {% endfor %}
+    <h1>{{ post.title }}</h1>
+    <p>{{ post.text }}</p>
+    <hr>
   </div>
 {% endblock %}

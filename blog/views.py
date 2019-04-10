@@ -6,17 +6,18 @@ from .models import *
 from .forms import PostForm, CatForm
 import logging
 from django.utils.html import escape
+from django.core import serializers
 
 logger = logging.getLogger(__name__)
 
 def blogHome(request):
 	cats = Category.getCategories()
 	template = loader.get_template('blog_home.html')
-	post = Post.getPosts(id=Post.getPosts().count())
+	post = Post.objects.get(post_id=int(Post.getPosts().count()))
 
 	context = {
 		'cats': cats,
-		'post': post[0],
+		'post': post,
 	}
 
 	return HttpResponse(template.render(context, request))
@@ -25,7 +26,7 @@ def categoryHome(request, desc):
 	template = loader.get_template('blog_category.html')
 
 	cat = get_object_or_404(Category, desc=desc)
-	posts = Post.getPosts(cat=cat, hidden=1)
+	posts = Post.getPosts(cat_id=cat.cat_id, hidden=1)
 	try:
 		post = posts[0]
 	except:
@@ -43,59 +44,74 @@ def blogPost(request, desc, id):
 	template = loader.get_template('blog_post.html')
 
 	cat = get_object_or_404(Category, desc=desc)
-	posts = Post.getPosts(id=id)
+	post = Post.getPosts(post_id=id)
 
 	context = {
-		'posts': posts,
+		'post': post,
 		'cat': cat,
 	}
 	return HttpResponse(template.render(context, request))
 
 def blogAdmin(request):
 	logger.info('Enter blogAdmin')
-
 	if request.method == 'POST':
-
 		if 'PostReq' in request.POST:
 			form = PostForm(request.POST)
 			if form.is_valid():
 				post = form.save(commit=False)
+				post.post_id = Post.objects.count() + 1
 				post.title = request.POST.get('title')
-				post.cat = get_object_or_404(Category, pk=int(request.POST.get('cat')))
+				post.cat_id = Category.getCategories(cat_id=int(request.POST.get('cat_id')))
 				post.text = request.POST.get('text')
-				post.id = request.POST.get('post_id')
-				if (post.id == '-1'):
-					post.id = Post.objects.count() + 1
 				post.save()
-				return redirect('/blog/{}/{}'.format(post.cat.desc, post.id))
+				return redirect('/blog/{}/{}'.format(post.cat_id.desc, post.post_id))
 			else:
-				return HttpResponse(request.POST.get('title'))
+				# Really need to change how I handle this
+				try:
+					#return HttpResponse('Fail-5')
+					post = Post.objects.get(post_id=int(request.POST.get('post_id'))+1)
+					post.title = request.POST.get('title')
+					post.cat_id = Category.getCategories(cat_id=int(request.POST.get('cat_id')))
+					post.text = request.POST.get('text')
+					post.save(update_fields=['title','cat_id','text'])
+					return redirect('/blog/{}/{}'.format(post.cat_id.desc, post.post_id))
+				except Exception as e:
+					return HttpResponse('<p>Invalid Post - {}</p>'.format(form.errors.as_text))
+				else:
+					return HttpResponse('Unknown Post Error')
+
 		elif 'CatReq' in request.POST:
 			form = CatForm(request.POST)
 			if form.is_valid():
-				post = form.save(commit=False)
-				post.desc = request.POST.get('desc')
-				try:
-					post.icon = request.POST.get('icon')[1]
-				except:
-					print('oh well')
+				cat = form.save(commit=False)
+				cat.cat_id = Category.objects.count() + 1
+				cat.desc = request.POST.get('desc')
 				if (request.POST.get('hide') == 'on'):
-					post.hide = True
+					cat.hide = True
 				else:
-					post.hide = False
-				post.id = request.POST.get('cat_id')
-				if (post.id == -1):
-					post.id = Category.objects.count() + 1
-				post.save()
-				return redirect('/blog/{}'.format(post.desc))
+					cat.hide = False
+				cat.save()
+				return redirect('/blog/{}'.format(cat.desc))
 			else:
-				return HttpResponse('Fail 1 - {}'.format(request.POST))
+				try:
+					cat = Category.objects.get(cat_id=int(request.POST.get('cat_id'))+1)
+					cat.desc = request.POST.get('desc')
+					if (request.POST.get('hide') == 'on'):
+						cat.hide = True
+					else:
+						cat.hide = False
+					cat.save(update_fields=['desc','hide'])
+					return redirect('/blog/{}'.format(cat.desc))
+				except:
+					return HttpResponse('<p>Error 1\n{}</p>'.format(form.errors.as_text))
+				else:
+					return HttpResponse('Unknown Cat Error')
 		else:
-			return HttpResponse('Fail 2 - {}'.format(request.POST))
+			return HttpResponse('<p>Error 2\n{}</p>'.format(form.errors.as_text))
 
 	template = loader.get_template('blog_admin.html')
 	cats = Category.getCategories(hidden=1)
-	posts = Post.getPosts(hidden=1)
+	posts = Post.objects.order_by('post_id')
 
 	pForm = PostForm()
 	pForm.id = -1
@@ -135,7 +151,6 @@ def blogTest(request):
 		'cat_json': Category.get_json(),
 		'pForm': pForm,
 		'cForm': cForm,
-		'post': posts[0],
 	}
 	return HttpResponse(template.render(context, request))
 

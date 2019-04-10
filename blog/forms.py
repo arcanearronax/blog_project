@@ -1,26 +1,27 @@
 from django import forms
-from django.forms import ModelForm, Textarea, Select
-from .models import Post, Category, icon_choices
+from django.forms import ModelForm, Textarea
+from .models import Post, Category
 
 class PostForm(forms.ModelForm):
     class Meta:
         model = Post
         #choices = forms.ModelMultipleChoiceField(queryset=Category.objects.all())
-        fields = ('id','title','cat','text',)
+        fields = ('post_id','title','cat_id','text',)
         widgets = {
             'text': Textarea(attrs={'cols': 45, 'rows': 15}),
-            'id': Textarea(attrs={'id':'post_id'})
+            'post_id': Textarea(attrs={'style':'display:none'}),
         }
 
 class CatForm(forms.ModelForm):
     class Meta:
         model = Category
-        fields = ('id','desc','hide',)
+
+        fields = ('cat_id','desc','hide',)
 
         choices = (
-            ('hide', 'True',)
+            ('hide', 'True')
         )
         widgets = {
             'hide': forms.CheckboxInput(),
-            'id': Textarea(attrs={'id':'cat_id'})
+            'cat_id': Textarea(attrs={'style':'display:none', 'id':'cat_id'})
         }

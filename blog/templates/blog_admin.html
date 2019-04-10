@@ -8,49 +8,34 @@
   <div class="w3-bar w3-black w3-opacity w3-hover-opacity-off w3-center w3-small">
     <a href="https://arcanedomain.duckdns.org/" class="w3-bar-item w3-button" style="width:25% !important">HOME</a>
     <a href="{% url 'blogHome' %}" class="w3-bar-item w3-button" style="width:25% !important">BLOG</a>
-<<<<<<< HEAD
-    <a href="{% url 'blogPost' desc=post.cat id=post.id %}" class="w3-bar-item w3-button" style="width:25% !important">Recent Post</a>
-=======
-    <a href="{% url 'blogPost' desc=posts.1.cat id=posts.1.id %}" class="w3-bar-item w3-button" style="width:25% !important">Recent Post</a>
->>>>>>> Adding javascript to handle interactive features. Making updates to the blog admin page so I can create new posts/categories and edit existing ones. Theres still an issue with getting the POST requests validated and processed, but this will just take a bit more work.
+    <a href="{% url 'blogPost' desc=posts.1.cat_id.desc id=posts.1.post_id %}" class="w3-bar-item w3-button" style="width:25% !important">Recent Post</a>
     <a href="#" class="w3-bar-item w3-button" style="width:25% !important">TOP</a>
   </div>
 {% endblock %}
 
 <!-- Need to update this to function as labeled -->
 {% block sidebar %}
-<<<<<<< HEAD
-	<a href="{% url 'blogPost' desc=post.cat id=post.id %}" class="w3-bar-item w3-button w3-padding-large w3-black">
-=======
-	<a class="w3-bar-item w3-button w3-padding-large w3-black" id="NewPost" onclick="updateBody(this)">
->>>>>>> Adding javascript to handle interactive features. Making updates to the blog admin page so I can create new posts/categories and edit existing ones. Theres still an issue with getting the POST requests validated and processed, but this will just take a bit more work.
+
+  <!-- Replace with a blog icon -->
+  <!-- https://www.pexels.com/photo/coffee-notebook-pen-writing-34587/ -->
+  <a href="{% url 'blogAdmin' %}"><img src="https://images.pexels.com/photos/34587/pexels-photo.jpg?auto=compress&cs=tinysrgb&h=120&w=120" style="width:100%"></a>
+
+  <a class="w3-bar-item w3-button w3-padding-large w3-black" id="NewPost" onclick="updateBody(this)">
 		<i class="fa fa-arrow-right w3-xxlarge"></i>
 		<p>New Post</p>
 	</a>
 
-<<<<<<< HEAD
-	<a href="{% url 'blogPost' desc=post.cat id=post.id %}" class="w3-bar-item w3-button w3-padding-large w3-black">
-=======
 	<a class="w3-bar-item w3-button w3-padding-large w3-black" id="EditPost" onclick="updateBody(this)">
->>>>>>> Adding javascript to handle interactive features. Making updates to the blog admin page so I can create new posts/categories and edit existing ones. Theres still an issue with getting the POST requests validated and processed, but this will just take a bit more work.
 		<i class="fa fa-arrow-right w3-xxlarge"></i>
 		<p>Edit Post</p>
 	</a>
 
-<<<<<<< HEAD
-	<a href="{% url 'blogPost' desc=post.cat id=post.id %}" class="w3-bar-item w3-button w3-padding-large w3-black">
-=======
 	<a class="w3-bar-item w3-button w3-padding-large w3-black" id="NewCategory" onclick="updateBody(this)">
->>>>>>> Adding javascript to handle interactive features. Making updates to the blog admin page so I can create new posts/categories and edit existing ones. Theres still an issue with getting the POST requests validated and processed, but this will just take a bit more work.
 		<i class="fa fa-arrow-right w3-xxlarge"></i>
 		<p>New Category</p>
 	</a>
 
-<<<<<<< HEAD
-	<a href="{% url 'blogPost' desc=post.cat id=post.id %}" class="w3-bar-item w3-button w3-padding-large w3-black">
-=======
 	<a class="w3-bar-item w3-button w3-padding-large w3-black" id="EditCategory" onclick="updateBody(this)">
->>>>>>> Adding javascript to handle interactive features. Making updates to the blog admin page so I can create new posts/categories and edit existing ones. Theres still an issue with getting the POST requests validated and processed, but this will just take a bit more work.
 		<i class="fa fa-arrow-right w3-xxlarge"></i>
 		<p>Edit Category</p>
 	</a>
@@ -65,64 +50,6 @@
 {% endblock %}
 
 {% block body %}
-<<<<<<< HEAD
-  <div class="w3-content w3-justify w3-text-grey w3-padding-64" id="about">
-		<h1>Submit a new post:</h1>
-
-		{% block content %}
-
-		<form method="POST" class="post-form">
-
-			{% csrf_token %}
-				<table>
-						{% for field in form %}
-						<tr>
-							<td>
-								{{ field.errors }}
-								{{ field.label_tag }} {{ field }}
-							</td>
-						</tr>
-						{% endfor %}
-				</table>
-
-				<input type="submit" value="Submit">
-			{% csrf_token %}
-
-			<table>
-				{% for field in pForm %}
-				<tr>
-					<td>
-						{{ field.errors }}
-						{{ field.label_tag }} {{ field }}
-					</td>
-				</tr>
-				{% endfor %}
-			</table>
-			<input type="submit" value="Submit" name="NewPost">
-		</form>
-
-		<hr>
-
-		<form method="POST" class="post-form">
-
-			{% csrf_token %}
-				<h3>Create a New Category:</h3>
-				<table>
-					{% for field in cForm %}
-					<tr>
-						<td>
-							{{ field.errors }}
-							{{ field.label_tag }} {{ field }}
-						</td>
-					</tr>
-					{% endfor %}
-				</table>
-				<input type="submit" value="Submit" name="NewCategory">
-		</form>
-
-		{% endblock %}
-	</div>
-=======
   <!-- This div contains the contents of our body -->
   <div class="w3-content w3-justify w3-text-grey w3-padding-64" id="about">
 
@@ -136,9 +63,15 @@
           {% csrf_token %}
           <table>
             {% for field in pForm %}
-            <tr>
-              <td> {{ field.label_tag }} {{ field }}</td>
-            </tr>
+              {% if field.html_name == 'id' %}
+                <tr style="display:none;">
+                  <td>{{ field.label_tag }} {{ field }}</td>
+                </tr>
+              {% else %}
+                <tr>
+                  <td> {{ field.label_tag }} {{ field }}</td>
+                </tr>
+              {% endif %}
             {% empty %}
               <p>Got nothing for you.</p>
             {% endfor %}
@@ -171,9 +104,15 @@
           {% csrf_token %}
           <table>
             {% for field in cForm %}
-            <tr>
-              <td> {{ field.label_tag }} {{ field }}</td>
-            </tr>
+              {% if field.html_name == 'id' %}
+                <tr style="display:none;">
+                  <td>{{ field.label_tag }} {{ field }}</td>
+                </tr>
+              {% else %}
+                <tr>
+                  <td> {{ field.label_tag }} {{ field }}</td>
+                </tr>
+              {% endif %}
             {% empty %}
               <p>Got nothing for you.</p>
             {% endfor %}
@@ -211,10 +150,12 @@
       var text_arr = post_json['texts'];
       var cat_arr = post_json['cats'];
       console.log('getPostInfo - Index - ' + selectPost.selectedIndex);
-      document.getElementById("post_id").value = selectPost.selectedIndex;
+      document.getElementById("id_post_id").value = selectPost.selectedIndex;
       document.getElementById("id_title").value = title_arr[selectPost.selectedIndex];
-      document.getElementById("id_text").defaultValue = text_arr[selectPost.selectedIndex];
-      document.getElementById("id_cat").value = cat_arr[selectPost.selectedIndex];
+      document.getElementById("id_text").value = text_arr[selectPost.selectedIndex];
+      console.log('Text: ' + text_arr[selectPost.selectedIndex]);
+      console.log('test');
+      document.getElementById("id_cat_id").value = cat_arr[selectPost.selectedIndex];
 
       console.log(title_arr);
       console.log(text_arr);
@@ -238,8 +179,11 @@
     function updateBody(link) {
       console.log('updateBody - ' + link.id);
       document.getElementById("id_hide").checked = 0;
-      document.getElementById("post_id").value = -1;
+      document.getElementById("id_post_id").value = -1;
       document.getElementById("cat_id").value = -1;
+      document.getElementById("id_title").value = '';
+      document.getElementById("id_text").value = '';
+      document.getElementById("id_desc").value = '';
       if (link.id == "NewPost") {
         document.getElementById("PostDiv").style.display = '';
         document.getElementById("PostFormDiv").style.display = '';
@@ -267,5 +211,4 @@
       }
     }
   </script>
->>>>>>> Adding javascript to handle interactive features. Making updates to the blog admin page so I can create new posts/categories and edit existing ones. Theres still an issue with getting the POST requests validated and processed, but this will just take a bit more work.
 {% endblock %}
