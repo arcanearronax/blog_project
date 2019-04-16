@@ -53,6 +53,13 @@
   <!-- This div contains the contents of our body -->
   <div class="w3-content w3-justify w3-text-grey w3-padding-64" id="about">
 
+    {% if user.is_authenticated %}
+      Hi {{ user.username }}!
+    {% else %}
+      <p>You are not logged in</p>
+      <a href="{% url 'blogLogin' %}">login</a>
+    {% endif %}
+
     <!-- Get an interface that displays a list of posts and populated form fields -->
     <div id="PostDiv" style="display:none;">
       <h1>Submit a new post:</h1>

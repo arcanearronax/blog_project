@@ -7,6 +7,7 @@ from .forms import PostForm, CatForm
 import logging
 from django.utils.html import escape
 from django.core import serializers
+from django.contrib.auth import views as auth_views
 
 logger = logging.getLogger(__name__)
 
@@ -159,7 +160,14 @@ def blogError(request):
 
 def blogLogin(request):
 	template = loader.get_template('blog_login.html')
-	context = {}
+	cats = Category.getCategories()
+	post = Post.objects.get(post_id=int(Post.getPosts().count()))
+
+	context = {
+		'cats': cats,
+		'post': post,
+	}
+
 	return HttpResponse(template.render(context, request))
 
 def blogLogout(request):
