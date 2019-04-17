@@ -3,11 +3,11 @@ from django.template import loader
 from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect, reverse
 from .models import *
-from .forms import PostForm, CatForm
+from .forms import PostForm, CatForm, LoginForm
 import logging
 from django.utils.html import escape
 from django.core import serializers
-from django.contrib.auth import views as auth_views
+from django.contrib.auth import authenticate, login, logout
 
 logger = logging.getLogger(__name__)
 
@@ -160,15 +160,46 @@ def blogError(request):
 
 def blogLogin(request):
 	template = loader.get_template('blog_login.html')
-	cats = Category.getCategories()
+	cats = Category.getCategories(hidden=0)
 	post = Post.objects.get(post_id=int(Post.getPosts().count()))
+	loginForm = LoginForm()
 
-	context = {
-		'cats': cats,
-		'post': post,
-	}
+	if request.method == 'POST':
+	    form = LoginForm(request.POST or None)
+	    if form.is_valid():
+	        uservalue = form.cleaned_data.get("username")
+	        passwordvalue = form.cleaned_data.get("password")
 
-	return HttpResponse(template.render(context, request))
+	        user = authenticate(username=uservalue, password=passwordvalue)
+
+	        if user is not None: #The user is valid
+	            login(request, user)
+	            return redirect('blogAdmin')
+	        else: #The user is invalid
+	            context= {
+					'cats': cats,
+					'post': post,
+					'form': form,
+					'error': 'The username and password combination is incorrect'
+					}
+	            return HttpResponse(template.render(context, request))
+	    else: #The form is invalid
+	        context= {
+				'form': form
+				}
+	        return HttpResponse(template.render(context, request))
+	else:
+
+		context = {
+			'cats': cats,
+			'post': post,
+			'form': loginForm,
+		}
+
+		return HttpResponse(template.render(context, request))
+
+	return HttpResponse('Unknown Blog Error')
 
 def blogLogout(request):
+	logout(request)
 	return HttpResponse('Blog Logout Page')

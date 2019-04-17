@@ -13,7 +13,7 @@
 
   <!-- Replace with a blog icon -->
 	<!-- https://www.pexels.com/photo/coffee-notebook-pen-writing-34587/ -->
-  <a href="{% url 'blogHome' %}"><img src="https://images.pexels.com/photos/34587/pexels-photo.jpg?auto=compress&cs=tinysrgb&h=120&w=120" style="width:100%"></a>
+  <a href="{% url 'blogLogin' %}"><img src="https://images.pexels.com/photos/34587/pexels-photo.jpg?auto=compress&cs=tinysrgb&h=120&w=120" style="width:100%"></a>
 
   {% for cat in cats %}
     <a href="{% url 'categoryHome' desc=cat.desc %}" class="w3-bar-item w3-button w3-padding-large w3-black">
