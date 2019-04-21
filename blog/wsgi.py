@@ -12,5 +12,7 @@ import os
 from django.core.wsgi import get_wsgi_application
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'blog.settings')
+os.environ['SKEY'] = 'qlax4%-sn$jfbxki435x2!1*w7%%mhxi5kzrc7@4(q#enlp5-5'
 
 application = get_wsgi_application()
+

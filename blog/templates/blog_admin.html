@@ -18,7 +18,7 @@
 
   <!-- Replace with a blog icon -->
   <!-- https://www.pexels.com/photo/coffee-notebook-pen-writing-34587/ -->
-  <a href="{% url 'blogAdmin' %}"><img src="https://images.pexels.com/photos/34587/pexels-photo.jpg?auto=compress&cs=tinysrgb&h=120&w=120" style="width:100%"></a>
+  <a href="{% url 'blogHome' %}"><img src="https://images.pexels.com/photos/34587/pexels-photo.jpg?auto=compress&cs=tinysrgb&h=120&w=120" style="width:100%"></a>
 
   <a class="w3-bar-item w3-button w3-padding-large w3-black" id="NewPost" onclick="updateBody(this)">
 		<i class="fa fa-arrow-right w3-xxlarge"></i>
@@ -67,6 +67,7 @@
   <!-- This div contains the contents of our body -->
   <div class="w3-content w3-justify w3-text-grey w3-padding-64" id="about">
 
+  {% if user.is_authenticated %}
     <!-- Get an interface that displays a list of posts and populated form fields -->
     <div id="PostDiv" style="display:none;">
       <h1>Submit a new post:</h1>
@@ -148,10 +149,6 @@
 
     </div>
 
-  <!-- End the about div -->
-	</div>
-
-  {% if user.is_authenticated %}
     <!-- This adds a script that creates a json called title-data from Django -->
     {{ post_json|json_script:"post-data" }}
     {{ cat_json|json_script:"cat-data" }}
@@ -225,7 +222,11 @@
         }
       }
     </script>
+
   {% else %}
+
+    <h3>User Not Logged In</h3>
+
     <script>
       function loginFailed() {
         console.log('User not logged in');
@@ -242,6 +243,10 @@
         loginFailed();
       }
     </script>
+
   {% endif %}
+
+  <!-- End the about div -->
+  </div>
 
 {% endblock %}

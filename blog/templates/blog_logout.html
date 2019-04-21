@@ -1,0 +1,19 @@
+{% load static %}
+<!DOCTYPE html>
+
+<html>
+  <body>
+    <h3>Blog Logout Page</h3>
+    <h6>Redirecting you now...</h6>
+
+    <script onload="redirectPage()">
+      function redirectPage() {
+        console.log("redirect");
+        window.location.href = "{% url 'blogHome' %}";
+      }
+      setTimeout('redirectPage()', 3000);
+    </script>
+
+  </body>
+
+</html>
