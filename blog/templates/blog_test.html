@@ -5,6 +5,12 @@
   <title>Test Page</title>
 {% endblock %}
 
+{% block javascript %}
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+  <script src="/javascript/ckeditor/ckeditor.js"></script>
+  <script src="/javascript/blog_admin.js"></script>
+{% endblock %}
+
 {% block navbar %}
   <div class="w3-bar w3-black w3-opacity w3-hover-opacity-off w3-center w3-small">
     <a href="https://arcanedomain.duckdns.org/" class="w3-bar-item w3-button" style="width:25% !important">HOME</a>
@@ -16,24 +22,26 @@
 
 <!-- Need to update this to function as labeled -->
 {% block sidebar %}
-	<a class="w3-bar-item w3-button w3-padding-large w3-black" id="NewPost" onclick="updateBody(this)">
+  <a href="{% url 'blogHome' %}"><img src="https://images.pexels.com/photos/34587/pexels-photo.jpg?auto=compress&cs=tinysrgb&h=120&w=120" style="width:100%"></a>
+
+	<a class="w3-bar-item w3-button w3-padding-large w3-black">
 		<i class="fa fa-arrow-right w3-xxlarge"></i>
-		<p>New Post</p>
+		<p>Button0</p>
 	</a>
 
-	<a class="w3-bar-item w3-button w3-padding-large w3-black" id="EditPost" onclick="updateBody(this)">
+	<a class="w3-bar-item w3-button w3-padding-large w3-black">
 		<i class="fa fa-arrow-right w3-xxlarge"></i>
-		<p>Edit Post</p>
+		<p>Button1</p>
 	</a>
 
-	<a class="w3-bar-item w3-button w3-padding-large w3-black" id="NewCategory" onclick="updateBody(this)">
+	<a class="w3-bar-item w3-button w3-padding-large w3-black">
 		<i class="fa fa-arrow-right w3-xxlarge"></i>
-		<p>New Category</p>
+		<p>Button2</p>
 	</a>
 
-	<a class="w3-bar-item w3-button w3-padding-large w3-black" id="EditCategory" onclick="updateBody(this)">
+	<a class="w3-bar-item w3-button w3-padding-large w3-black">
 		<i class="fa fa-arrow-right w3-xxlarge"></i>
-		<p>Edit Category</p>
+		<p>Button3</p>
 	</a>
 
 {% endblock %}
@@ -46,135 +54,32 @@
 {% endblock %}
 
 {% block body %}
-  <!-- This div contains the contents of our body -->
-  <div class="w3-content w3-justify w3-text-grey w3-padding-64" id="about">
 
-    <!-- Get an interface that displays a list of posts and populated form fields -->
-    <div id="PostDiv" style="display:none;">
-      <h1>Submit a new post:</h1>
+  <p>
+    When \(a \ne 0\), there are two solutions to \(ax^2 + bx + c = 0\) and they are
+    $$x = {-b \pm \sqrt{b^2-4ac} \over 2a}.$$
+  </p>
 
-      <!-- This div contains the Post form itself -->
-      <div id="PostFormDiv" style="display:inherit; float:left">
-        <form method="POST" class="post-form" id="PostForm">
-          {% csrf_token %}
-          <table>
-            {% for field in pForm %}
-              <tr>
-                <td> {{ field.name }} {{ field }}</td>
-              </tr>
-            {% empty %}
-              <p>Got nothing for you.</p>
-            {% endfor %}
-          </table>
-          <input type="submit" value="Submit" name="PostButton" id="PostButton">
-        </form>
-      </div>
+  <h1>
+     Prove: If \(p\) is a prime and \(n\) a positive integer, then \(p^{n}={\displaystyle \sum_{k=0}^{n}\phi(p^{k})}\)
+  </h1>
 
-      <!-- This div contains the available Posts form -->
-      <div id="PostSelectDiv" style="display:inherit; float:right;">
-        <select size="{{ pcnt }}" id="PostSelect" onclick="getPostInfo()">
-          {% for post in posts %}
-            <option val="{{ post }}">{{ post }}</option>
-          {% empty %}
-            <p>No Posts</p>
-          {% endfor %}
-        </select>
-      </div>
+  <p>
+    To show this, we use induction on \(n\). We begin by showing the base case \(n=0\).
+    $$p^{0}=1={\displaystyle \sum_{k=0}^{0}}\phi(p^{k})=\phi(p^{0})=\phi(1)=1$$
+    so the base case is proven.
+    Now we assume the case for \(n\) to be true and show the case of \(n+1\) is true.
+    $$p^{n+1}={\displaystyle \sum_{k=0}^{n+1}}\phi(p^{k})=1+{\displaystyle \sum_{k=1}^{n+1}}p^{k-1}(p-1)=1+(p-1)+p(p-1)+...+p^{n-1}(p-1)+p^{n}(p-1)=(1-1)+(p-p)+(p^{2}-p^{2})+...+(p^{n-1}-p^{n-1})+p^{n}=p^{n}$$
+    So we have shown that if \(p\) is prime and \(n\in\mathbb{N}\) then
+    $$p^{n}={\displaystyle \sum_{k=0}^{n}\phi(p^{k})}.$$
+  </p>
 
-    <!-- End the Post div -->
-    </div>
+  <h1>Now let's trying adding a new text editing field.</h1>
 
-    <!-- Get an interface that displays a list of cats and populated form fields -->
-    <div id="CatDiv" style="display:none;">
-      <h1>Create New Category:</h1>
+  <textarea name="editor1" id="editor1">&lt;p&gt;Initial editor content.&lt;/p&gt;</textarea>
 
-      <!-- This div contains the Cat form itself -->
-      <div id="CatFormDiv" style="display:inherit; float:left">
-        <form method="POST" class="cat-form" id="CatForm">
-          {% csrf_token %}
-          <table>
-            {% for field in cForm %}
-            <tr>
-              <td> {{ field.label_tag }} {{ field }}</td>
-            </tr>
-            {% empty %}
-              <p>Got nothing for you.</p>
-            {% endfor %}
-          </table>
-          <input type="submit" value="Submit" name="CatButton" id="CatButton">
-        </form>
-      </div>
-
-      <!-- This div contains the available Posts form -->
-      <div id="CatSelectDiv" style="display:inherit; float:right;">
-        <select size="{{ ccnt }}" id="CatSelect" onclick="getCatInfo()">
-          {% for cat in cats %}
-            <option val="{{ cat }}">{{ cat }}</option>
-          {% empty %}
-            <p>No Posts</p>
-          {% endfor %}
-        </select>
-      </div>
-
-    </div>
-
-  <!-- End the about div -->
-	</div>
-
-  <!-- This adds a script that creates a json called title-data from Django -->
-  {{ post_json|json_script:"post-data" }}
-  {{ cat_json|json_script:"cat-data" }}
-
-  <!-- This script will get handle updating the form values -->
   <script>
-    function getPostInfo() {
-      var selectPost = document.getElementById("PostSelect");
-      var post_json = JSON.parse(document.getElementById('post-data').textContent);
-      var title_arr = post_json['titles'];
-      var text_arr = post_json['texts'];
-      var cat_arr = post_json['cats'];
-      console.log('getPostInfo - Index - ' + selectPost.selectedIndex);
-      document.getElementById("id_title").value = title_arr[selectPost.selectedIndex];
-      document.getElementById("id_text").defaultValue = text_arr[selectPost.selectedIndex];
-      document.getElementById("id_cat").value = cat_arr[selectPost.selectedIndex];
-    }
-
-    function getCatInfo() {
-      var selectCat = document.getElementById("CatSelect");
-      var cat_json = JSON.parse(document.getElementById('cat-data').textContent);
-      var desc_arr = cat_json['descs'];
-      console.log('getCatInfo - Index - ' + selectCat.selectedIndex);
-      document.getElementById("id_desc").value = desc_arr[selectCat.selectedIndex];
-    }
+    getCKEditor('editor1');
   </script>
 
-  <!-- This script is used by the sidebar to hide elements on the page -->
-  <script>
-    function updateBody(link) {
-      console.log('updateBody - ' + link.id);
-      if (link.id == "NewPost") {
-        document.getElementById("PostDiv").style.display = '';
-        document.getElementById("PostFormDiv").style.display = '';
-        document.getElementById("PostSelectDiv").style.display = 'none';
-        document.getElementById("CatDiv").style.display = 'none';
-      } else if (link.id == "EditPost") {
-        document.getElementById("PostDiv").style.display = '';
-        document.getElementById("PostFormDiv").style.display = '';
-        document.getElementById("PostSelectDiv").style.display = '';
-        document.getElementById("CatDiv").style.display = 'none';
-      } else  if (link.id == "NewCategory") {
-        document.getElementById("PostDiv").style.display = 'none';
-        document.getElementById("CatDiv").style.display = '';
-        document.getElementById("CatFormDiv").style.display = '';
-        document.getElementById("CatSelectDiv").style.display = 'none';
-      } else if (link.id == "EditCategory") {
-        document.getElementById("PostDiv").style.display = 'none';
-        document.getElementById("CatDiv").style.display = '';
-        document.getElementById("CatFormDiv").style.display = '';
-        document.getElementById("CatSelectDiv").style.display = '';
-      } else {
-        console.log('updateBody - FAILURE');
-      }
-    }
-  </script>
 {% endblock %}

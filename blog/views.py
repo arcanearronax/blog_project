@@ -163,34 +163,8 @@ def blogAdmin(request):
 
 	return HttpResponse(template.render(context, request))
 
-# Using this to test new features
-def blogTest(request):
-	template = loader.get_template('blog_test.html')
-	cats = Category.getCategories(hidden=1)
-	posts = Post.getPosts(hidden=1)
-
-	pForm = PostForm()
-	pForm.id = -1
-	cForm = CatForm()
-	cForm.id = -1
-
-	context = {
-		'cats': cats,
-		'posts': posts,
-		'pcnt': posts.count(),
-		'ccnt': cats.count(),
-		'post_json': Post.get_json(),
-		'cat_json': Category.get_json(),
-		'pForm': pForm,
-		'cForm': cForm,
-	}
-	return HttpResponse(template.render(context, request))
-
-def blogError(request):
-	return HttpResponse('You got an error.')
-
 def blogLogin(request):
-	logger.info('Enter: blogLogin')
+	logger.info('Enter: blogLogin')	
 	template = loader.get_template('blog_login.html')
 	cats = Category.getCategories(hidden=0)
 	post = Post.objects.get(post_id=int(Post.getPosts().count()))
@@ -244,5 +218,31 @@ def blogLogout(request):
 	template = loader.get_template('blog_logout.html')
 	context = {
 
+	}
+	return HttpResponse(template.render(context, request))
+
+def blogError(request):
+	return HttpResponse('You got an error.')
+
+# Using this to test new features
+def blogTest(request):
+	template = loader.get_template('blog_test.html')
+	cats = Category.getCategories(hidden=1)
+	posts = Post.getPosts(hidden=1)
+
+	pForm = PostForm()
+	pForm.id = -1
+	cForm = CatForm()
+	cForm.id = -1
+
+	context = {
+		'cats': cats,
+		'posts': posts,
+		'pcnt': posts.count(),
+		'ccnt': cats.count(),
+		'post_json': Post.get_json(),
+		'cat_json': Category.get_json(),
+		'pForm': pForm,
+		'cForm': cForm,
 	}
 	return HttpResponse(template.render(context, request))

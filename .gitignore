@@ -2,3 +2,4 @@ blog/settings.py
 blog/__pycache__
 blog/migrations
 *_old*
+static/javascript/ckeditor/*

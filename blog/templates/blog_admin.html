@@ -4,6 +4,33 @@
   <title>Blog Admin</title>
 {% endblock %}
 
+{% block javascript %}
+  {% if user.is_authenticated %}
+    {{ post_json|json_script:"post-data" }}
+    {{ cat_json|json_script:"cat-data" }}
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+    <script src="/javascript/ckeditor/ckeditor.js"></script>
+    <script src="/javascript/blog_admin.js"></script>
+  {% else %}
+    <script>
+      function loginFailed() {
+        console.log('User not logged in');
+      }
+      function getCatInfo() {
+        loginFailed();
+      }
+
+      function getCatInfo() {
+        loginFailed();
+      }
+
+      function updateBody(link) {
+        loginFailed();
+      }
+    </script>
+  {% endif %}
+{% endblock %}
+
 {% block navbar %}
   <div class="w3-bar w3-black w3-opacity w3-hover-opacity-off w3-center w3-small">
     <a href="https://arcanedomain.duckdns.org/" class="w3-bar-item w3-button" style="width:25% !important">HOME</a>
@@ -146,106 +173,11 @@
           {% endfor %}
         </select>
       </div>
-
     </div>
 
-    <!-- This adds a script that creates a json called title-data from Django -->
-    {{ post_json|json_script:"post-data" }}
-    {{ cat_json|json_script:"cat-data" }}
-    <!-- This script will get handle updating the form values -->
-    <script>
-      function getPostInfo() {
-        var selectPost = document.getElementById("PostSelect");
-        var post_json = JSON.parse(document.getElementById('post-data').textContent);
-        var title_arr = post_json['titles'];
-        var text_arr = post_json['texts'];
-        var cat_arr = post_json['cats'];
-        console.log('getPostInfo - Index - ' + selectPost.selectedIndex);
-        document.getElementById("id_post_id").value = selectPost.selectedIndex;
-        document.getElementById("id_title").value = title_arr[selectPost.selectedIndex];
-        document.getElementById("id_text").value = text_arr[selectPost.selectedIndex];
-        console.log('Text: ' + text_arr[selectPost.selectedIndex]);
-        console.log('test');
-        document.getElementById("id_cat_id").value = cat_arr[selectPost.selectedIndex];
-
-        console.log(title_arr);
-        console.log(text_arr);
-        console.log(cat_arr);
-      }
-
-      function getCatInfo() {
-        var selectCat = document.getElementById("CatSelect");
-        var cat_json = JSON.parse(document.getElementById('cat-data').textContent);
-        var desc_arr = cat_json['descs'];
-        var hide_arr = cat_json['hides'];
-        console.log('getCatInfo - Index - ' + selectCat.selectedIndex);
-        document.getElementById("cat_id").value = selectCat.selectedIndex;
-        document.getElementById("id_desc").value = desc_arr[selectCat.selectedIndex];
-        document.getElementById('id_hide').checked = hide_arr[selectCat.selectedIndex];
-      }
-    </script>
-
-    <!-- This script is used by the sidebar to hide elements on the page -->
-    <script>
-      function updateBody(link) {
-        console.log('updateBody - ' + link.id);
-        document.getElementById("id_hide").checked = 0;
-        document.getElementById("id_post_id").value = -1;
-        document.getElementById("cat_id").value = -1;
-        document.getElementById("id_title").value = '';
-        document.getElementById("id_text").value = '';
-        document.getElementById("id_desc").value = '';
-        if (link.id == "NewPost") {
-          document.getElementById("PostDiv").style.display = '';
-          document.getElementById("PostFormDiv").style.display = '';
-          document.getElementById("PostSelectDiv").style.display = 'none';
-          document.getElementById("CatDiv").style.display = 'none';
-        } else if (link.id == "EditPost") {
-          document.getElementById("PostSelect").value = '';
-          document.getElementById("PostDiv").style.display = '';
-          document.getElementById("PostFormDiv").style.display = '';
-          document.getElementById("PostSelectDiv").style.display = '';
-          document.getElementById("CatDiv").style.display = 'none';
-        } else  if (link.id == "NewCategory") {
-          document.getElementById("PostDiv").style.display = 'none';
-          document.getElementById("CatDiv").style.display = '';
-          document.getElementById("CatFormDiv").style.display = '';
-          document.getElementById("CatSelectDiv").style.display = 'none';
-        } else if (link.id == "EditCategory") {
-          document.getElementById("CatSelect").value = '';
-          document.getElementById("PostDiv").style.display = 'none';
-          document.getElementById("CatDiv").style.display = '';
-          document.getElementById("CatFormDiv").style.display = '';
-          document.getElementById("CatSelectDiv").style.display = '';
-        } else {
-          console.log('updateBody - FAILURE');
-        }
-      }
-    </script>
-
   {% else %}
-
     <h3>User Not Logged In</h3>
-
-    <script>
-      function loginFailed() {
-        console.log('User not logged in');
-      }
-      function getCatInfo() {
-        loginFailed();
-      }
-
-      function getCatInfo() {
-        loginFailed();
-      }
-
-      function updateBody(link) {
-        loginFailed();
-      }
-    </script>
-
   {% endif %}
-
   <!-- End the about div -->
   </div>
 
