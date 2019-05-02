@@ -27,6 +27,7 @@ def blogHome(request):
 
 	return HttpResponse(template.render(context, request))
 
+# Just a test
 def categoryHome(request, desc):
 	logger.info('Enter: categoryHome')
 	template = loader.get_template('blog_category.html')
@@ -164,7 +165,7 @@ def blogAdmin(request):
 	return HttpResponse(template.render(context, request))
 
 def blogLogin(request):
-	logger.info('Enter: blogLogin')	
+	logger.info('Enter: blogLogin')
 	template = loader.get_template('blog_login.html')
 	cats = Category.getCategories(hidden=0)
 	post = Post.objects.get(post_id=int(Post.getPosts().count()))
