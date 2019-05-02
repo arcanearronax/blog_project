@@ -164,7 +164,7 @@ def blogAdmin(request):
 	return HttpResponse(template.render(context, request))
 
 def blogLogin(request):
-	logger.info('Enter: blogLogin')	
+	logger.info('Enter: blogLogin')
 	template = loader.get_template('blog_login.html')
 	cats = Category.getCategories(hidden=0)
 	post = Post.objects.get(post_id=int(Post.getPosts().count()))
@@ -235,6 +235,10 @@ def blogTest(request):
 	cForm = CatForm()
 	cForm.id = -1
 
+	pString = ''
+	for x in Post.get_json()['titles']:
+		pString += '{};'.format(x)
+
 	context = {
 		'cats': cats,
 		'posts': posts,
@@ -244,5 +248,6 @@ def blogTest(request):
 		'cat_json': Category.get_json(),
 		'pForm': pForm,
 		'cForm': cForm,
+		'post_string': pString,
 	}
 	return HttpResponse(template.render(context, request))

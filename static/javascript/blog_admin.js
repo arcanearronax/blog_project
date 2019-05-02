@@ -70,9 +70,19 @@ function getCKEditor(id) {
   var t = document.getElementById(id);
   console.log('getCk id: ' + t.id);
   CKEDITOR.replace(t, {
-    width: 600
+    width: 600,
+    height: 350
     }
   );
+  CKEDITOR.on('instanceReady', function(event) {
+    event.editor.commands.source.exec();
+    }
+  );
+  CKEDITOR.config.resize_minHeight = 250;
+  CKEDITOR.config.resize_maxHeight = 500;
+  CKEDITOR.config.resize_minWidth = 500;
+  CKEDITOR.config.resize_maxWidth = 1000;
+  CKEDITOR.config.resize_dir = 'both';
 }
 
 function updateCKEditor(id, text) {

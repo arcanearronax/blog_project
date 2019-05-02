@@ -9,6 +9,8 @@
   <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
   <script src="/javascript/ckeditor/ckeditor.js"></script>
   <script src="/javascript/blog_admin.js"></script>
+  <script src="/javascript/blog_combobox.js"></script>
+  {{ post_json|json_script:"post-data" }}
 {% endblock %}
 
 {% block navbar %}
@@ -82,4 +84,43 @@
     getCKEditor('editor1');
   </script>
 
+  <form>
+    <p>This widget uses javascript to transform this:</p>
+    <table border="0">
+    	<tr>
+    		<td>Where do you come from?</td>
+    		<td><input type="text" name="myText_ex" value="Norway" selectBoxOptions="Canada;Denmark;Finland;Germany;Mexico;Norway;Sweden;United Kingdom;United States"></td>
+    	</tr>
+    	<tr>
+    		<td>What is your name?</td>
+    		<td><input type="text" name="myText_ex2" value="" selectBoxOptions="Amy;Andrew;Carol;Jennifer;Jim;Tim;Tommy;Vince"></td>
+    	</tr>
+    </table>
+    <p>Into this:</p>
+    <table border="0">
+    	<tr>
+    		<td>Where do you come from?</td>
+    		<td><input type="text" name="myText" id="myText" value="Test Title" selectBoxOptions="{{ post_string }}"></td>
+    	</tr>
+    	<tr>
+    		<td>What is your name?</td>
+    		<td><input type="text" name="myText2" value="" selectBoxOptions="Amy;Andrew;Carol;Jennifer;Jim;Tim;Tommy;Vince"></td>
+
+        <div id="EditOption" class="select-editable">
+          <select>
+            <option>Option 1</option>
+            <option>Option 2</option>
+          </select>
+          <input type="text" name="myText3" value="" />
+        </div>
+    	</tr>
+    </table>
+  </form>
+
+  <p>{{ post_string }}</p>
+
+  <script type="text/javascript">
+    <!-- Pass the input object to replace -->
+    createEditableSelect(document.forms[0].myText);
+  </script>
 {% endblock %}

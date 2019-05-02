@@ -11,6 +11,7 @@
     <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
     <script src="/javascript/ckeditor/ckeditor.js"></script>
     <script src="/javascript/blog_admin.js"></script>
+    <script src="/javascript/blog_combobox.js"></script>
   {% else %}
     <script>
       function loginFailed() {
@@ -132,6 +133,10 @@
           {% endfor %}
         </select>
       </div>
+
+      <script type="text/javascript">
+        createEditableSelect(document.getElementById('myText'));
+      </script>
 
     <!-- End the Post div -->
     </div>
