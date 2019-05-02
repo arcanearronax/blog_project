@@ -1,5 +1,10 @@
-blog/settings.py
 blog/__pycache__
 blog/migrations
-*_old*
+
 static/javascript/ckeditor/*
+
+*_old*
+debug*
+*.log
+*.old
+logs
