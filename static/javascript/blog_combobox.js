@@ -58,15 +58,15 @@ var activeOption;
 function highlightSelectBoxOption() {
   if(this.style.backgroundColor=='#316AC5'){
     this.style.backgroundColor='';
-    this.style.color='';
+    this.style.color='#000000';
   } else {
     this.style.backgroundColor='#316AC5';
-    this.style.color='#FFF';
+    this.style.color='#000000';
   }
 
   if(activeOption) {
     activeOption.style.backgroundColor='';
-    activeOption.style.color='';
+    activeOption.style.color='#000000';
   }
   activeOption = this;
 }
@@ -133,6 +133,7 @@ function createEditableSelect(dest) {
       anOption.className='selectBoxAnOption';
       anOption.onclick = selectOptionValue;
       anOption.style.width = optionDiv.style.width.replace('px','') - 2 + 'px';
+      anOption.style.color = '#000000'
       anOption.onmouseover = highlightSelectBoxOption;
       optionDiv.appendChild(anOption);
       optionsTotalHeight = optionsTotalHeight + anOption.offsetHeight;
