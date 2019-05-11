@@ -21,13 +21,13 @@ from django.conf.urls.static import static
 from . import views
 
 urlpatterns = [
-    # Need to figure out 'overloading paths' here to make this work
-    path('blog/', views.blogHome, name='blogHome'),
-    path('blog/login/', views.blogLogin, name='blogLogin'),
-    path('blog/logout/', views.blogLogout, name='blogLogout'),
-    path('blog/admin/', views.blogAdmin, name='blogAdmin'),
-    path('blog/test/', views.blogTest, name='blogTest'),
-    path('blog/error/', views.blogError, name='blogError'),
-    path('blog/<slug:desc>/', views.categoryHome, name='categoryHome'),
-	path('blog/<slug:desc>/<int:id>/', views.blogPost, name='blogPost'),
+    # These are here for legacy support
+    path('', views.blogHome, name='blogHome'),
+    path('login/', views.blogLogin, name='blogLogin'),
+    path('logout/', views.blogLogout, name='blogLogout'),
+    path('admin/', views.blogAdmin, name='blogAdmin'),
+    path('test/', views.blogTest, name='blogTest'),
+    path('error/', views.blogError, name='blogError'),
+    path('<slug:desc>/', views.categoryHome, name='categoryHome'),
+	path('<slug:desc>/<int:id>/', views.blogPost, name='blogPost'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

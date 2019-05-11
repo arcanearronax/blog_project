@@ -25,7 +25,9 @@ SECRET_KEY = os.environ.get('SKEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['arcanedomain.duckdns.org']
+#ALLOWED_HOSTS = ['arcanedomain.duckdns.org']
+#ALLOWED_HOSTS = [os.environ.get('AHOST')]
+ALLOWED_HOSTS = ['localhost', 'arcanedomain.duckdns.org', 'blog.arcanedomain.duckdns.org']
 
 
 # Application definition
@@ -79,6 +81,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'blog',
+		#'USER': os.environ.get('userName'),
+		#'PASSWORD': os.environ.get('userPass'),
 		'USER': 'webmaster',
 		'PASSWORD': 'Dexter313!',
 		'HOST': 'localhost',
@@ -123,7 +127,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
-STATIC_URL = '/static/'
+STATIC_URL = '/'
 
 # Adding a root - commenting out to get js working
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
@@ -155,13 +159,13 @@ LOGGING = {
         'views-debug': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': '/home/webmaster/web_proj/blog/logs/debug/views.log',
+            'filename': '/var/log/django/debug/views.log',
             'formatter': 'verbose',
         },
         'views-info': {
             'level': 'INFO',
             'class': 'logging.FileHandler',
-            'filename': '/home/webmaster/web_proj/blog/logs/views.log',
+            'filename': '/var/log/django/views.log',
             'formatter': 'simple',
         },
 	},

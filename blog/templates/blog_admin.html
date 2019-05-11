@@ -9,8 +9,8 @@
     {{ post_json|json_script:"post-data" }}
     {{ cat_json|json_script:"cat-data" }}
     <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
-    <script src="/javascript/ckeditor/ckeditor.js"></script>
-    <script src="/javascript/blog_admin.js"></script>
+    <script type="text/javascript" src="/javascript/ckeditor/ckeditor.js"></script>
+    <script type="text/javascript" src="/javascript/blog_admin.js"></script>
   {% else %}
     <script>
       function loginFailed() {

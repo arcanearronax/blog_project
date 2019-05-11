@@ -9,3 +9,5 @@ debug*
 *.log
 *.old
 logs
+
+*.swp
