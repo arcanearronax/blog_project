@@ -25,9 +25,7 @@ SECRET_KEY = os.environ.get('SKEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-#ALLOWED_HOSTS = ['arcanedomain.duckdns.org']
-#ALLOWED_HOSTS = [os.environ.get('AHOST')]
-ALLOWED_HOSTS = ['localhost', 'arcanedomain.duckdns.org', 'blog.arcanedomain.duckdns.org']
+ALLOWED_HOSTS = [os.environ.get('AHOST')]
 
 
 # Application definition
@@ -40,7 +38,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'blog.apps.BlogConfig',
-    #'latexify',
 ]
 
 MIDDLEWARE = [
@@ -81,10 +78,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'blog',
-		#'USER': os.environ.get('userName'),
-		#'PASSWORD': os.environ.get('userPass'),
-		'USER': 'webmaster',
-		'PASSWORD': 'Dexter313!',
+		'USER': os.environ.get('userName'),
+		'PASSWORD': os.environ.get('userPass'),
 		'HOST': 'localhost',
 		'PORT': '',
     }

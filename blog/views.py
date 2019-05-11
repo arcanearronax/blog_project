@@ -81,7 +81,7 @@ def blogAdmin(request):
 				post.text = request.POST.get('text')
 				post.save()
 				logger.info('New Post Saved: {}'.format(post.post_id))
-				return redirect('/blog/{}/{}'.format(post.cat_id.desc, post.post_id))
+				return redirect('/{}/{}/'.format(post.cat_id.desc, post.post_id))
 			else:
 				# Really need to change how I handle this
 				logger.info('invalid form')
@@ -93,7 +93,7 @@ def blogAdmin(request):
 					post.text = request.POST.get('text')
 					post.save(update_fields=['title','cat_id','text'])
 					logger.info('Post Updated: {}'.format(post.post_id))
-					return redirect('/blog/{}/{}'.format(post.cat_id.desc, post.post_id))
+					return redirect('/{}/{}/'.format(post.cat_id.desc, post.post_id))
 				except Exception as e:
 					logger.error('Failed Post Update: {}'.format(post.post_id))
 					return HttpResponse('<p>Invalid Post - {}</p>'.format(form.errors.as_text))
@@ -114,7 +114,7 @@ def blogAdmin(request):
 					cat.hide = False
 				cat.save()
 				logger.info('New Cat Saved: {}')
-				return redirect('/blog/{}'.format(cat.desc))
+				return redirect('/{}/'.format(cat.desc))
 			else:
 				try:
 					cat = Category.objects.get(cat_id=int(request.POST.get('cat_id'))+1)
@@ -125,7 +125,7 @@ def blogAdmin(request):
 						cat.hide = False
 					cat.save(update_fields=['desc','hide'])
 					logger.info('Cat Updated: {}'.format(cat.cat_id))
-					return redirect('/blog/{}'.format(cat.desc))
+					return redirect('/{}/'.format(cat.desc))
 				except:
 					logger.error('Failed Cat Update: {}'.format(cat.cat_id))
 					return HttpResponse('<p>Error 1\n{}</p>'.format(form.errors.as_text))
