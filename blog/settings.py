@@ -15,10 +15,6 @@ import os
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
-
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get('SKEY')
 
@@ -70,10 +66,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'blog.wsgi.application'
 
-
-# Database
-# https://docs.djangoproject.com/en/2.1/ref/settings/#databases
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
@@ -84,10 +76,6 @@ DATABASES = {
 		'PORT': '',
     }
 }
-
-
-# Password validation
-# https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -104,10 +92,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
-# Internationalization
-# https://docs.djangoproject.com/en/2.1/topics/i18n/
-
 LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'America/New_York'
@@ -118,19 +102,10 @@ USE_L10N = True
 
 USE_TZ = True
 
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/2.1/howto/static-files/
-
-STATIC_URL = '/'
+STATIC_URL = '/static/'
 
 # Adding a root - commenting out to get js working
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
-
-# Trying to get JS working
-#STATICFILES_DIRS = (
-#	os.path.join(BASE_DIR, "static"),
-#)
 
 LOGGING = {
 	'version': 1,
@@ -149,7 +124,7 @@ LOGGING = {
 		'file': {
             'level': 'DEBUG',
 			'class': 'logging.FileHandler',
-            'filename': 'debug.log',
+            'filename': '/var/log/django/debug.log',
 		},
         'views-debug': {
             'level': 'DEBUG',
@@ -177,23 +152,3 @@ LOGGING = {
         },
 	},
 }
-
-# Old Logging Info
-#LOGGING = {
-#	'version': 1,
-#	'disable_existing_loggers': False,
-#	'handlers': {
-#		'file': {
-#			'level': 'DEBUG',
-#			'class': 'logging.FileHandler',
-#			'filename': 'debug.log',
-#		},
-#	},
-#	'loggers': {
-#		'django': {
-#			'handlers': ['file'],
-#			'level': 'DEBUG',
-#			'propogate': True,
-#		},
-#	},
-#}
