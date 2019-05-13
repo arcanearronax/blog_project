@@ -102,7 +102,7 @@ USE_L10N = True
 
 USE_TZ = True
 
-STATIC_URL = '/static/'
+STATIC_URL = 'static/'
 
 # Adding a root - commenting out to get js working
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
