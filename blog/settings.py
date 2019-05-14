@@ -138,6 +138,18 @@ LOGGING = {
             'filename': '/var/log/django/views.log',
             'formatter': 'simple',
         },
+        'rest-debug': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': '/var/log/django/debug/rest.log',
+            'formatter': 'verbose',
+        },
+        'rest-info': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': '/var/log/django/rest.log',
+            'formatter': 'simple',
+        },
 	},
 	'loggers': {
 		'django': {
