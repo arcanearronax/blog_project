@@ -157,10 +157,16 @@ LOGGING = {
 			'level': 'DEBUG',
             'propagate': True,
 		},
+        # Need to update this to blog.views
         'viewer': {
             'handlers': ['views-debug','views-info'],
             'level': 'DEBUG',
             'propagate': True,
+        },
+        'blog.rest': {
+            'handlers': ['rest-debug','rest-info'],
+            'level': 'DEBUG',
+            'propogate': True,
         },
 	},
 }
