@@ -6,6 +6,8 @@ logger = logging.getLogger('blog.rest')
 
 class BaseSerializer(serializers.ModelSerializer):
     logger.debug('Enter: {}'.format('BASE SERIALIZER'))
+    def __new__(self,name):
+        return type('{}Serializer'.format(name.capitalize()),(BaseSerializer,),{'doc': 'Class created dynamically'})
 
 class CategorySerializer(serializers.ModelSerializer):
     logger.debug('Enter1: {}'.format('CATEGORY SERIALIZER'))
