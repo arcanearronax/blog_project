@@ -16,6 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, re_path
 from django.conf import settings
+from django.conf.urls import include
 from django.conf.urls.static import static
 
 from . import views, rest
@@ -28,7 +29,7 @@ urlpatterns = [
     path('admin/', views.blogAdmin, name='blogAdmin'),
     path('test/', views.blogTest, name='blogTest'),
     path('error/', views.blogError, name='blogError'),
-    re_path(r'^rest/((?P<objtype>\w+)/((?P<objind>\w+)/|$)|$)', rest.restReq, name='restReq'),
+    re_path(r'^api/', include('blog.router')),
     path('<slug:desc>/', views.categoryHome, name='categoryHome'),
 	path('<slug:desc>/<int:id>/', views.blogPost, name='blogPost'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
