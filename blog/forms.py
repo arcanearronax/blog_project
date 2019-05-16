@@ -6,7 +6,7 @@ class PostForm(forms.ModelForm):
     class Meta:
         model = Post
         #choices = forms.ModelMultipleChoiceField(queryset=Category.objects.all())
-        fields = ('post_id','title','cat_id','text',)
+        fields = ('post_id','title','cat','text',)
         widgets = {
             'text': Textarea(attrs={'cols': 45, 'rows': 15}),
             'post_id': Textarea(attrs={'style':'display:none'}),

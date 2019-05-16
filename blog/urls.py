@@ -23,7 +23,6 @@ from . import views
 urlpatterns = [
     # These are here for legacy support
     path('', views.blogHome, name='blogHome'),
-    path('/Mathematics', views.blogLogin, name='blogLogin'),
     path('login/', views.blogLogin, name='blogLogin'),
     path('logout/', views.blogLogout, name='blogLogout'),
     path('admin/', views.blogAdmin, name='blogAdmin'),

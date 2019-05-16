@@ -47,7 +47,7 @@ function getPostInfo() {
   CKEDITOR.instances['id_text'].setData(text_arr[selectPost.selectedIndex]);
   console.log('Text: ' + text_arr[selectPost.selectedIndex]);
   console.log('test');
-  document.getElementById("id_cat_id").value = cat_arr[selectPost.selectedIndex];
+  document.getElementById("id_cat").value = cat_arr[selectPost.selectedIndex];
 
   console.log(title_arr);
   console.log(text_arr);

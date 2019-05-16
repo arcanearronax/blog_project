@@ -69,6 +69,7 @@ def blogPost(request, desc, id):
 
 def blogAdmin(request):
 	logger.info('Enter: blogAdmin')
+	logger.debug('REQUEST: {}'.format(request.POST))
 	if request.method == 'POST':
 		if 'PostReq' in request.POST:
 			logger.info('Received PostReq request')
@@ -77,7 +78,7 @@ def blogAdmin(request):
 				post = form.save(commit=False)
 				post.post_id = Post.objects.count() + 1
 				post.title = request.POST.get('title')
-				post.cat_id = Category.getCategories(cat_id=int(request.POST.get('cat_id')))
+				post.cat_id = Category.getCategories(cat_id=int(request.POST.get('cat')))
 				post.text = request.POST.get('text')
 				post.save()
 				logger.info('New Post Saved: {}'.format(post.post_id))
@@ -89,11 +90,11 @@ def blogAdmin(request):
 					#return HttpResponse('Fail-5')
 					post = Post.objects.get(post_id=int(request.POST.get('post_id'))+1)
 					post.title = request.POST.get('title')
-					post.cat_id = Category.getCategories(cat_id=int(request.POST.get('cat_id')))
+					post.cat = Category.getCategories(cat_id=int(request.POST.get('cat')))
 					post.text = request.POST.get('text')
 					post.save(update_fields=['title','cat_id','text'])
 					logger.info('Post Updated: {}'.format(post.post_id))
-					return redirect('/{}/{}/'.format(post.cat_id.desc, post.post_id))
+					return redirect('/{}/{}/'.format(post.cat.desc, post.post_id))
 				except Exception as e:
 					logger.error('Failed Post Update: {}'.format(post.post_id))
 					return HttpResponse('<p>Invalid Post - {}</p>'.format(form.errors.as_text))

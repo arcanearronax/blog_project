@@ -36,7 +36,7 @@ class Category(models.Model):
 
 class Post(models.Model):
 	post_id = models.IntegerField(primary_key=True)
-	cat_id = models.ForeignKey(Category, on_delete=models.CASCADE, default=0, db_column='cat_id')
+	cat = models.ForeignKey(Category, on_delete=models.CASCADE, default=0, db_column='cat_id')
 	title = models.CharField(max_length=100)
 	text = models.CharField(max_length=4000)
 	pub_date = models.DateTimeField(auto_now_add=True, blank=True)
@@ -58,10 +58,10 @@ class Post(models.Model):
 		if (hidden):
 			posts = Post.objects.all()
 		else:
-			posts = Post.objects.filter(cat_id=1)
+			posts = Post.objects.filter(cat=1)
 
 		if (cat_id != -1):
-			posts = posts.filter(cat_id=cat_id)
+			posts = posts.filter(cat=cat_id)
 
 		return posts
 
@@ -69,6 +69,6 @@ class Post(models.Model):
 		json = dict(
 			titles=[post.title for post in Post.objects.order_by('post_id')],
 			texts=[post.text for post in Post.objects.order_by('post_id')],
-			cats=[post.cat_id.cat_id for post in Post.objects.order_by('post_id')]
+			cats=[post.cat.cat_id for post in Post.objects.order_by('post_id')]
 		)
 		return json
