@@ -18,6 +18,7 @@ from django.urls import path, re_path
 from django.conf import settings
 from django.conf.urls import include
 from django.conf.urls.static import static
+from rest_framework.authtoken import views as authviews
 
 from . import views, rest
 
@@ -30,6 +31,8 @@ urlpatterns = [
     path('test/', views.blogTest, name='blogTest'),
     path('error/', views.blogError, name='blogError'),
     re_path(r'^api/', include('blog.router')),
+    re_path('api-auth/',authviews.obtain_auth_token, name="api-auth"),
+    re_path(r'^api-new/', rest.PostViewSet.getPosts, name="api-new"),
     path('<slug:desc>/', views.categoryHome, name='categoryHome'),
 	path('<slug:desc>/<int:id>/', views.blogPost, name='blogPost'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
