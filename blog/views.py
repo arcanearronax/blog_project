@@ -70,6 +70,7 @@ def blogPost(request, desc, id):
 def blogAdmin(request):
 	logger.info('Enter: blogAdmin')
 	if request.method == 'POST':
+		logger.debug('--Create: {}'.format(request.__dict__))
 		if 'PostReq' in request.POST:
 			logger.info('Received PostReq request')
 			form = PostForm(request.POST)

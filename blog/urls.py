@@ -31,8 +31,7 @@ urlpatterns = [
     path('test/', views.blogTest, name='blogTest'),
     path('error/', views.blogError, name='blogError'),
     re_path(r'^api/', include('blog.router')),
-    re_path('api-auth/',authviews.obtain_auth_token, name="api-auth"),
-    re_path(r'^api-new/', rest.PostViewSet.getPosts, name="api-new"),
+    path('api-auth/',authviews.obtain_auth_token, name="api-auth"),
     path('<slug:desc>/', views.categoryHome, name='categoryHome'),
 	path('<slug:desc>/<int:id>/', views.blogPost, name='blogPost'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

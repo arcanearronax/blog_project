@@ -6,6 +6,8 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.authentication import SessionAuthentication,TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
+from django.shortcuts import get_object_or_404
+from .forms import PostForm
 
 import logging
 
@@ -20,18 +22,56 @@ class PostViewSet(viewsets.ModelViewSet):
     authentication_classes = (TokenAuthentication,SessionAuthentication,)
     permission_classes = (IsAuthenticated,)
 
+    # GET - post/
     def list(self,request):
-        logger.debug('Enter: {}'.format('getPosts'))
-        newest = self.__class__.queryset.order_by('created').last()
-        serializer = self.__class__.serializer_class()(newest)
+        logger.debug('--Get: {}'.format(''))
+        serializer = self.get_serializer_class()(self.get_queryset(), many=True)
         return Response(serializer.data)
 
-    @action(methods=['get'], detail=False)
-    def getPosts(self,request):
-        logger.debug('Enter: {}'.format('getPosts'))
-        newest = self.get_queryset.order_by('created').last()
-        serializer = self.get_serializer_class()(newest)
-        return Response(serializer.data)
+    # GET - post/{pk}
+    def retrieve(self, request, pk=None):
+        logger.debug('--Retrieve pk: {}'.format(pk))
+        post = get_object_or_404(self.get_queryset(),pk=pk)
+        return Response(self.get_serializer_class()(post).data)
+
+    # POST - post/
+    def create(self, request):
+        logger.debug('--Create: {}'.format(request.data))
+        request.data['post_id'] = self.queryset.count() + 1
+        serializer = self.get_serializer_class()(data=request.data)
+        if serializer.is_valid():
+            logger.debug('Instance Is Valid')
+            instance = serializer.save()
+            logger.debug('INSTANCE: {}'.format(instance.__dict__))
+            return Response(serializer.data, status=201)
+        else:
+            logger.debug('Instance Is Invalid')
+            return Response(serializer.errors, status=400)
+
+    # PUT - post/{pk}
+    def update(self, request, pk=None):
+        logger.debug('--Update: {}'.format(pk))
+        try:
+            post = get_object_or_404(self.get_queryset(),pk=pk)
+        except Error as e:
+            logger.debug('ERROR: {}'.format(e))
+            return Response(e, status=503)
+
+        serializer = self.get_serializer_class()(data=request.data)
+        if serializer.is_valid():
+        #instance = serializer.update(post,request.data)
+            instance = serializer.update(instance=post,validated_data=request.data)
+            return Response(serializer.data, status=201)
+        else:
+            return Response(serializer.errors, status=400)
+
+    # This is just for custom methods
+    # @action(methods=['get'], detail=False)
+    # def getPost(self,request):
+    #     logger.debug('Enter: {}'.format('method: getPost'))
+    #     newest = self.get_queryset().order_by('pub_date').last()
+    #     serializer = self.get_serializer_class()(newest)
+    #     return Response(serializer.data)
 
 class CategoryViewSet(viewsets.ModelViewSet):
     logger.debug('Enter: {} '.format('CategoryViewSet'))
