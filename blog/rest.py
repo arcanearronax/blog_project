@@ -1,17 +1,13 @@
-from .models import Category, Post
-from .forms import CatForm, PostForm, LoginForm
-from .serializers import CategorySerializer, PostSerializer#, BaseSerializer
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.authentication import SessionAuthentication,TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
-from .forms import PostForm
-
+from .models import Category, Post
+from .forms import CatForm, PostForm, LoginForm
+from .serializers import CategorySerializer, PostSerializer
 import logging
-
-# Need to modify this to be a class, rather than just methods
 
 logger = logging.getLogger(__name__)
 
@@ -52,7 +48,11 @@ class PostViewSet(viewsets.ModelViewSet):
     # PUT - post/{pk}
     def update(self, request, pk=None):
         logger.debug('--Update: {}'.format(pk))
-        post = Post.objects.get(pk=pk)
+        try:
+            post = Post.objects.get(pk=pk)
+        except Exception as e:
+            logger.debug(e)
+            return self.create(request)
         serializer = self.get_serializer_class()(data=request.data,partial=True)
         if serializer.is_valid():
             logger.debug('SERIALIZER: {}'.format('valid'))
@@ -121,7 +121,36 @@ class CategoryViewSet(viewsets.ModelViewSet):
             return Response(serializer.errors, status=400)
 
     def update(self,request,pk=None):
-        raise NotImplementedError('To do')
+        logger.debug('--Update: {}'.format(pk))
+        try:
+            category = Category.objects.get(pk=pk)
+        except Exception as e:
+            logger.debug(e)
+            return self.create(request)
+        serializer = self.get_serializer_class()(data=request.data,partial=True)
+        if serializer.is_valid():
+            logger.debug('SERIALIZER: {}'.format('valid'))
+            instance = serializer.update(instance=category,validated_data=request.data)
+            logger.debug('INSTANCE: {}'.format(instance))
+            # I feel like there should be a better way to handle this
+            instance.save()
+            serializer.save()
+            # The above should also address this
+            return self.retrieve(request,pk=pk)
+        else:
+            logger.debug('SERIALIZER: {}'.format('invalid'))
+            logger.debug(serializer.errors)
+            return Response(serializer.errors, status=400)
 
     def destroy(self,request,pk=None):
-        raise NotImplementedError('To do')
+        logger.debug('--Destroy: {}'.format(pk))
+        try:
+            post = Category.objects.get(pk=pk).delete()
+        except TypeError as t:
+            logger.debug('Post does not exist: {}'.format(pk))
+            return Response({'warning': 'pk does not exist: {}'.format(pk)})
+        except Exception as e:
+            logger.debug('Destroy Error: {}'.format(e))
+            return Response({'error': e}, status=500)
+        else:
+            return Response({'cat_id': pk}, status=200)
