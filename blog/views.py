@@ -71,6 +71,7 @@ def blogAdmin(request):
 	logger.info('Enter: blogAdmin')
 	logger.debug('REQUEST: {}'.format(request.POST))
 	if request.method == 'POST':
+		logger.debug('--Create: {}'.format(request.__dict__))
 		if 'PostReq' in request.POST:
 			logger.info('Received PostReq request')
 			form = PostForm(request.POST)

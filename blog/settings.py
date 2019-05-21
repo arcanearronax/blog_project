@@ -34,6 +34,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'blog.apps.BlogConfig',
+    'rest_framework',
+    'rest_framework.authtoken',
 ]
 
 MIDDLEWARE = [
@@ -65,6 +67,16 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'blog.wsgi.application'
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+}
 
 DATABASES = {
     'default': {
@@ -138,6 +150,18 @@ LOGGING = {
             'filename': '/var/log/django/views.log',
             'formatter': 'simple',
         },
+        'rest-debug': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': '/var/log/django/debug/rest.log',
+            'formatter': 'verbose',
+        },
+        'rest-info': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': '/var/log/django/rest.log',
+            'formatter': 'simple',
+        },
 	},
 	'loggers': {
 		'django': {
@@ -145,10 +169,16 @@ LOGGING = {
 			'level': 'DEBUG',
             'propagate': True,
 		},
+        # Need to update this to blog.views
         'viewer': {
             'handlers': ['views-debug','views-info'],
             'level': 'DEBUG',
             'propagate': True,
+        },
+        'blog.rest': {
+            'handlers': ['rest-debug','rest-info'],
+            'level': 'DEBUG',
+            'propogate': True,
         },
 	},
 }
