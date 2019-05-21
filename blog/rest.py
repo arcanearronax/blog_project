@@ -6,7 +6,7 @@ from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
 from .models import Category, Post
 from .forms import CatForm, PostForm, LoginForm
-from .serializers import CategorySerializer, PostSerializer
+from .serializers import CategorySerializer, PostSerializer, BaseSerializer
 import logging
 
 logger = logging.getLogger(__name__)
@@ -20,7 +20,8 @@ class PostViewSet(viewsets.ModelViewSet):
 
     # GET - post/
     def list(self,request):
-        logger.debug('--Get: {}'.format(''))
+        logger.debug('--List: {}'.format('posts'))
+
         serializer = self.get_serializer_class()(self.get_queryset(), many=True)
         return Response(serializer.data)
 
@@ -43,6 +44,7 @@ class PostViewSet(viewsets.ModelViewSet):
             return Response(serializer.data, status=201)
         else:
             logger.debug('Instance Is Invalid')
+            logger.debug(serializer.errors)
             return Response(serializer.errors, status=400)
 
     # PUT - post/{pk}
@@ -55,13 +57,8 @@ class PostViewSet(viewsets.ModelViewSet):
             return self.create(request)
         serializer = self.get_serializer_class()(data=request.data,partial=True)
         if serializer.is_valid():
-            logger.debug('SERIALIZER: {}'.format('valid'))
             instance = serializer.update(instance=post,validated_data=request.data)
-            logger.debug('INSTANCE: {}'.format(instance))
-            # I feel like there should be a better way to handle this
-            instance.save()
             serializer.save()
-            # The above should also address this
             return self.retrieve(request,pk=pk)
         else:
             logger.debug('SERIALIZER: {}'.format('invalid'))
@@ -133,7 +130,6 @@ class CategoryViewSet(viewsets.ModelViewSet):
             instance = serializer.update(instance=category,validated_data=request.data)
             logger.debug('INSTANCE: {}'.format(instance))
             # I feel like there should be a better way to handle this
-            instance.save()
             serializer.save()
             # The above should also address this
             return self.retrieve(request,pk=pk)
