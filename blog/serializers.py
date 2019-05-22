@@ -4,31 +4,40 @@ import logging
 
 logger = logging.getLogger('blog.rest')
 
+# All model serializers are based off this class.
 class BaseSerializer(serializers.ModelSerializer):
     logger.debug('Enter: {}'.format('Base Serializer'))
 
-    # Investigate using class methods to dynamically create serializers
+    # Subclasses will need to implement a class named Meta
 
+    # Use this to create model instances
     def create(self,validated_data):
-        logger.debug('{}: Create'.format(self.__class__.__name__))
-        return self.Meta.model(**validated_data)
+        logger.debug('--SerializerCreate:\t{}'.format(validated_data))
+        return self.Meta.model(**validated_data).save()
 
+    # Use this to update model instances
     def update(self,instance,validated_data):
-        logger.debug('{}: Update'.format(self.__class__.__name__))
+        logger.debug('--SerializerUpdate:\t{}'.format(validated_data))
 
         for k,v in validated_data.items():
-            logger.debug('{}:\t{}'.format(k,v))
             try:
                 setattr(instance,k,v)
             except ValueError as v:
                 # Just a quick and dirty fix for this for now
-                logger.debug(v)
-                setattr(instance,'{}.{}'.format(k,k),v)
+                logger.debug('\tV: {}'.format(v))
+                try:
+                    logger.debug('\tRETRY: {}'.format(k.__class__))
+                    setattr(instance,'{}.{}'.format(k,k),v)
+                except Exception as e:
+                    logger.debug('\tE: {}'.format(e))
             except Exeception as e:
-                logger.debug('Failure: {}'.format(e))
+                logger.debug('\tFailure: {}'.format(e))
 
+        # This is required to update the model instance
         instance.save()
+        return instance
 
+# Use this for the Post model
 class PostSerializer(BaseSerializer):
     logger.debug('Enter: {}'.format('POST SERIALIZER'))
 
@@ -36,56 +45,7 @@ class PostSerializer(BaseSerializer):
         model = Post
         fields = '__all__'
 
-
-    # Update method?
-    # def update(self,instance,validated_data):
-    #     logger.debug('Serializer: UPDATE')
-    #     # Update this to grab whatever fields that exist for the object
-    #     instance.title = validated_data.get('title', instance.title)
-    #     instance.text = validated_data.get('text', instance.text)
-    #     instance.cat_id = Category.objects.get(pk=validated_data.get('cat_id', instance.cat_id))
-    #     logger.debug('Serializer: RETURNING')
-    #     return instance
-
-# class PostSerializer(serializers.ModelSerializer):
-#     logger.debug('Enter: {}'.format('POST SERIALIZER'))
-#
-#     class Meta:
-#         model = Post
-#         fields = '__all__'
-#
-#     def create(self,validated_data):
-#         logger.debug('Serializer: CREATE')
-#         return self.Meta.model(**validated_data)
-#
-#     # Update method?
-#     def update(self,instance,validated_data):
-#         logger.debug('Serializer: UPDATE')
-#         # Update this to grab whatever fields that exist for the object
-#         instance.title = validated_data.get('title', instance.title)
-#         instance.text = validated_data.get('text', instance.text)
-#         instance.cat_id = Category.objects.get(pk=validated_data.get('cat_id', instance.cat_id))
-#         logger.debug('Serializer: RETURNING')
-#         return instance
-
 class CategorySerializer(BaseSerializer):
     class Meta:
         model = Category
         fields = '__all__'
-
-# class CategorySerializer(serializers.ModelSerializer):
-#     logger.debug('Enter: {}'.format('CATEGORY SERIALIZER'))
-#     class Meta:
-#         model = Category
-#         fields = '__all__'
-#
-#     def create(self,validated_data):
-#         logger.debug('Serializer: CREATE')
-#         return self.Meta.model(**validated_data)
-#
-#     def update(self,instance,validated_data):
-#         logger.debug('Serializer: UPDATE')
-#         instance.desc = validated_data.get('desc', instance.desc)
-#         instance.hide = validated_data.get('hide', instance.hide)
-#         logger.debug('Serializer: RETURNING')
-#         return instance
