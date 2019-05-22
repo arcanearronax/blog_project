@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils.timezone import now
 
 icon_choices = (
 	('calculator', 'fa-calculator'),
@@ -39,8 +40,8 @@ class Post(models.Model):
 	cat_id = models.ForeignKey(Category, on_delete=models.CASCADE, default=0, db_column='cat_id')
 	title = models.CharField(max_length=100)
 	text = models.CharField(max_length=4000)
-	pub_date = models.DateTimeField(auto_now_add=True, blank=True)
-	change_date = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+	pub_date = models.DateTimeField(blank=True, default=now)
+	change_date = models.DateTimeField(blank=True, null=True,default=now)
 
 	def __str__(self):
 		return self.title
