@@ -41,11 +41,16 @@ class BaseViewSet(viewsets.ModelViewSet):
     # POST
     def create(self,request):
         logger.debug('--Create:\t{}'.format(request.body))
-        queryset = self.get_queryset()
         request.data['post_id'] = self.queryset.count() + 1
         serializer = self.get_serializer_class()(data=request.data)
         if serializer.is_valid():
-            instance = serializer.save()
+            obj = self.get_serializer_class().Meta.model
+            logger.debug('\t--OBJ: {}'.format(obj.__dict__))
+            for k in serializer.data:
+                logger.debug('\t--{}:'.format(k))
+                eval('obj.set_{}(serializer.data["{}"])'.format(k,k))
+
+            serializer.save()
             return Response(serializer.data, status=201)
         else:
             logger.debug('Instance Is Invalid')
