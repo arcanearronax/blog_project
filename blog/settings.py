@@ -162,6 +162,12 @@ LOGGING = {
             'filename': '/var/log/django/rest.log',
             'formatter': 'simple',
         },
+        'models-debug': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': '/var/log/django/debug/models.log',
+            'formatter': 'verbose',
+        },
 	},
 	'loggers': {
 		'django': {
@@ -177,6 +183,11 @@ LOGGING = {
         },
         'blog.rest': {
             'handlers': ['rest-debug','rest-info'],
+            'level': 'DEBUG',
+            'propogate': True,
+        },
+        'blog.models': {
+            'handlers': ['models-debug'],
             'level': 'DEBUG',
             'propogate': True,
         },

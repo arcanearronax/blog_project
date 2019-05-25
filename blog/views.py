@@ -229,23 +229,14 @@ def blogError(request):
 
 # Using this to test new features
 def blogTest(request):
+	logger.debug('Enter: blogTest')
 	template = loader.get_template('blog_test.html')
-	cats = Category.getCategories(hidden=1)
-	posts = Post.getPosts(hidden=1)
 
-	pForm = PostForm()
-	pForm.id = -1
-	cForm = CatForm()
-	cForm.id = -1
+	cat = NewCategory.objects.last()
+	cat.get(test=123,test0=234,desc='123')
+
+	logger.debug('Cat Name: {}'.format(cat))
 
 	context = {
-		'cats': cats,
-		'posts': posts,
-		'pcnt': posts.count(),
-		'ccnt': cats.count(),
-		'post_json': Post.get_json(),
-		'cat_json': Category.get_json(),
-		'pForm': pForm,
-		'cForm': cForm,
 	}
 	return HttpResponse(template.render(context, request))
