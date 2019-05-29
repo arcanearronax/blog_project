@@ -14,8 +14,8 @@ logger = logging.getLogger('viewer')
 def blogHome(request):
 	logger.info('Enter: blogHome')
 	template = loader.get_template('blog_home.html')
-	cats = Category.getCategories()
-	post = Post.objects.get(post_id=int(Post.getPosts().count()))
+	cats = Category.objects.filter(hide=False)
+	post = Post.objects.get(post_id=int(Post.objects.count()))
 
 	logger.debug('post: {}'.format(post))
 	logger.debug('catCount: {}'.format(cats.count()))
@@ -32,22 +32,17 @@ def categoryHome(request, desc):
 	logger.info('Enter: categoryHome')
 	template = loader.get_template('blog_category.html')
 
-	cat = get_object_or_404(Category, desc=desc)
-	posts = Post.objects.filter(cat_id=cat.cat_id).order_by('-post_id')
-	try:
-		post = posts[0]
-	except:
-		logger.error('post[0] not found')
-		post = ''
-
-
-	logger.info('postCount: {}'.format(posts.count()))
+	# Get a category object
+	cat = Category.objects.get(desc=desc)
 	logger.info('cat: {}'.format(cat))
-	logger.info('post: {}'.format(post))
+
+	# Get a post queryset
+	posts = Post.objects.filter(cat=cat).order_by('-post_id')
+	logger.debug('posts: {}'.format(posts.count()))
+
 	context = {
 		'posts': posts,
 		'cat': cat,
-		'post': post,
 	}
 
 	return HttpResponse(template.render(context, request))
@@ -56,11 +51,12 @@ def blogPost(request, desc, id):
 	logger.info('Enter: blogPost')
 	template = loader.get_template('blog_post.html')
 
-	cat = get_object_or_404(Category, desc=desc)
-	post = Post.getPosts(post_id=id)
-
+	cat = Category.objects.get(desc=desc)
 	logger.info('cat: {}'.format(cat))
+
+	post = Post.objects.get(pk=id)
 	logger.info('post: {}'.format(post))
+
 	context = {
 		'post': post,
 		'cat': cat,
@@ -70,10 +66,13 @@ def blogPost(request, desc, id):
 def blogAdmin(request):
 	logger.info('Enter: blogAdmin')
 	logger.debug('REQUEST: {}'.format(request.POST))
+
 	if request.method == 'POST':
 		logger.debug('--Create: {}'.format(request.__dict__))
+
 		if 'PostReq' in request.POST:
 			logger.info('Received PostReq request')
+
 			form = PostForm(request.POST)
 			if form.is_valid():
 				post = form.save(commit=False)
@@ -139,10 +138,11 @@ def blogAdmin(request):
 			return HttpResponse('<p>Error 2\n{}</p>'.format(form.errors.as_text))
 
 	template = loader.get_template('blog_admin.html')
-	cats = Category.getCategories(hidden=1)
+	cats = Category.objects.filter(hide=1)
 	posts = Post.objects.order_by('post_id')
 
 	pForm = PostForm()
+	logger.debug('pForm: {}'.format(pForm.__dict__))
 	pForm.id = -1
 	cForm = CatForm()
 	cForm.id = -1
@@ -169,8 +169,8 @@ def blogAdmin(request):
 def blogLogin(request):
 	logger.info('Enter: blogLogin')
 	template = loader.get_template('blog_login.html')
-	cats = Category.getCategories(hidden=0)
-	post = Post.objects.get(post_id=int(Post.getPosts().count()))
+	cats = Category.objects.filter(hide=0)
+	post = Post.objects.get(post_id=int(Post.objects.count()))
 	loginForm = LoginForm()
 
 	if request.method == 'POST':
@@ -232,10 +232,7 @@ def blogTest(request):
 	logger.debug('Enter: blogTest')
 	template = loader.get_template('blog_test.html')
 
-	cat = NewCategory.objects.last()
-	cat.get(test=123,test0=234,desc='123')
-
-	logger.debug('Cat Name: {}'.format(cat))
+	
 
 	context = {
 	}
