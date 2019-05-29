@@ -41,63 +41,55 @@ class BaseViewSet(viewsets.ModelViewSet):
     # POST
     def create(self,request):
         logger.debug('--Create:\t{}'.format(request.body))
-        request.data['post_id'] = self.queryset.count() + 1
-        serializer = self.get_serializer_class()(data=request.data)
-        if serializer.is_valid():
-            obj = self.get_serializer_class().Meta.model
-            logger.debug('\t--OBJ: {}'.format(obj.__dict__))
-            for k in serializer.data:
-                logger.debug('\t--{}:'.format(k))
-                eval('obj.set_{}(serializer.data["{}"])'.format(k,k))
 
+        # Add a primary key ID entry to get a valid
+        req_data = request.data
+        req_data[self.Tmp.model._meta.pk.name] = self.get_queryset().count() + 1
+        logger.debug('TEST: {}'.format(req_data))
+
+        # Validate the serializer and save the instance or fail
+        serializer = self.get_serializer_class()(data=req_data)
+        if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data, status=201)
+            return Response(serializer.data, status=202)
         else:
-            logger.debug('Instance Is Invalid')
-            logger.debug(serializer.errors)
-            return Response(serializer.errors, status=400)
+            logger.debug('INVALID DATA')
+            return Response('INVALID DATA', status=400)
+
+        return Response('UNKNOWN FAILURE', status=500)
 
     # PUT - /{pk}
     def update(self, request, pk=None):
         logger.debug('--ViewUpdate:\t{}'.format(pk))
 
-        # Get the model instance or...
+        # Get the model instance or bail out
         try:
-            instance = self.get_serializer_class().Meta.model.objects.get(pk=pk)
-            logger.debug('\t--Instance Class: {}'.format(instance.__class__))
-
-        # Pass along to create()
+            instance = self.get_serializer_class()(data=request.data).__class__.Meta.model.objects.get(pk=pk)
         except Exception as e:
-            logger.debug('\t--Instance Exception: {}'.format(e))
-            self.create(request)
+            return Response(e, status=403)
 
-        # Get our serializer with request data
-        request.data['post_id'] = pk
-        for k,v in request.data.items():
-            logger.debug('\t--TEST: {} -\t{}'.format(k,v))
-        serializer = self.get_serializer_class()(data=request.data,partial=True)
-        logger.debug('\t--Serializer Data: {}'.format(serializer))
+        # Get our request data to validate
+        req_data = request.data
+        req_data[self.Tmp.model._meta.pk.name] = pk
 
-        # Validate our serializer
-        if (serializer.is_valid()):
-            logger.debug('\t--Serializer is valid')
+        # Validate the request data
+        serializer = self.get_serializer_class()(data=req_data)
+        logger.debug('Instance: {}'.format(instance.__dict__))
 
-            # Update the instance based on the request data
-            instance = serializer.update(instance=instance,validated_data=request.data)
-            logger.debug('\t--TESTER: {}'.format(instance.__class__))
-            serializer.save()
+        for k,v in req_data.items():
+            if k != '_state':
+                logger.debug('{}: {}'.format(k,v))
+                try:
+                    instance.__dict__[k] = v
+                except Exception as e:
+                    logger.debug(e)
 
-            # Return the instance we updated
-            logger.debug('\t--Return2')
-            return Response(serializer.data, status=201)
-
-        # Serializer is invalid
+        if serializer.is_valid:
+            return Response('VALID')
         else:
-            # Return an error
-            logger.debug('\tSerializer is invalid')
-            logger.debug(serializer.errors)
-            logger.debug(serializer.data)
-            return Response(serializer.errors, status=400)
+            return Response('INVALID')
+
+        return Response('UNKNOWN', status=500)
 
     def destroy(self, request, pk=None):
         logger.debug('--Destroy: {}'.format(pk))
