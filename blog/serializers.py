@@ -20,11 +20,13 @@ class BaseSerializer(serializers.ModelSerializer):
     # Use this to update model instances
     def update(self,instance,validated_data):
         for k,v in validated_data.items():
-            logger.debug('SER-UPD: {}: {}'.format(k,v))
-            try:
-                instance.__dict__[k] = v
-            except Exception as e:
-                logger.debug(e)
+            if k != '_state':
+                logger.debug('{}: {}'.format(k,v))
+                try:
+                    instance.__dict__[k] = v
+                except Exception as e:
+                    logger.debug(e)
+        return instance
         raise NotImplementedError()
 
 

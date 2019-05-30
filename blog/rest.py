@@ -62,34 +62,24 @@ class BaseViewSet(viewsets.ModelViewSet):
     def update(self, request, pk=None):
         logger.debug('--ViewUpdate:\t{}'.format(pk))
 
-        # Get the model instance or bail out
+        serializer = self.get_serializer_class()
+
+        # Get the model instance or try to create the object
         try:
-            instance = self.get_serializer_class()(data=request.data).__class__.Meta.model.objects.get(pk=pk)
+            instance = self.Tmp.model.objects.get(pk=pk)
+            logger.debug('TESTER: {}'.format(instance))
         except Exception as e:
-            return Response(e, status=403)
+            return Response(str(e), status=403)
+            self.create(request)
 
-        # Get our request data to validate
+        # Update the instance we found
         req_data = request.data
-        req_data[self.Tmp.model._meta.pk.name] = pk
-
-        # Validate the request data
         serializer = self.get_serializer_class()(data=req_data)
-        logger.debug('Instance: {}'.format(instance.__dict__))
+        instance = serializer.update(instance,req_data)
+        instance.save()
+        logger.debug('INST -- {}'.format(instance.__dict__))
 
-        for k,v in req_data.items():
-            if k != '_state':
-                logger.debug('{}: {}'.format(k,v))
-                try:
-                    instance.__dict__[k] = v
-                except Exception as e:
-                    logger.debug(e)
-
-        if serializer.is_valid:
-            return Response('VALID')
-        else:
-            return Response('INVALID')
-
-        return Response('UNKNOWN', status=500)
+        return Response(self.get_serializer_class()(instance), status=203)
 
     def destroy(self, request, pk=None):
         logger.debug('--Destroy: {}'.format(pk))
