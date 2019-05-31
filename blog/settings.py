@@ -131,6 +131,10 @@ LOGGING = {
             'format': '{asctime}-{levelname}: {message}',
             'style': '{',
         },
+        'tabbed': {
+            'format': '{asctime}-{levelname}:\t{message}',
+            'style': '{',
+        },
     },
 	'handlers': {
 		'file': {
@@ -154,7 +158,7 @@ LOGGING = {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
             'filename': '/var/log/django/debug/rest.log',
-            'formatter': 'verbose',
+            'formatter': 'tabbed',
         },
         'rest-info': {
             'level': 'INFO',
