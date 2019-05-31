@@ -12,90 +12,95 @@ import logging
 logger = logging.getLogger(__name__)
 
 class BaseViewSet(viewsets.ModelViewSet):
-    logger.debug('Enter: {}'.format('Base Viewset'))
+    logger.info('Initiating: {}'.format('Base Viewset'))
 
     class Tmp:
         model = None
 
-    # logger.debug('Check Model:')
-    # if (Tmp.model):
-    #     logger.debug('Model Exists')
-    #     serializer_class = eval('{}Serializer'.format(Tmp.model))
-    #     queryset = serializer_class.Meta.model.objects.all()
     authentication_classes = (TokenAuthentication,SessionAuthentication,)
     permission_classes = (IsAuthenticated,)
 
-    # GET
-    def list(self,request):
-        logger.debug('--List:\t{}'.format(request.body))
-        serializer = self.get_serializer_class()(self.get_queryset(), many=True)
-        return Response(serializer.data)
+    # Use this to get the model instance with the primary key
+    def getObject(self,pk):
+        return self.Tmp.model.objects.get(pk=pk)
 
-    # GET /pk
+    # GET (all objects)
+    def list(self,request):
+        logger.info('List')
+        return Response(self.get_serializer_class()(self.get_queryset(), many=True).data, status=200)
+
+    # GET (single object) /{pk}
     def retrieve(self,request,pk=None):
-        logger.debug('--List:\t{}'.format(request.body))
-        # I think there needs to be a serializer method to call for this
-        instance = get_object_or_404(self.get_queryset(),pk=pk)
-        return Response(self.get_serializer_class()(instance).data)
+        logger.info('Retrieve:\t{}'.format(pk))
+        return Response(self.get_serializer_class()(self.getObject(pk)).data)
 
     # POST
     def create(self,request):
-        logger.debug('--Create:\t{}'.format(request.body))
+        logger.info('Create:\t{}'.format(request.body))
 
         # Add a primary key ID entry to get a valid
         req_data = request.data
         req_data[self.Tmp.model._meta.pk.name] = self.get_queryset().count() + 1
-        logger.debug('TEST: {}'.format(req_data))
+        logger.debug('request_data: {}'.format(req_data))
 
         # Validate the serializer and save the instance or fail
         serializer = self.get_serializer_class()(data=req_data)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data, status=202)
+            return Response(serializer.data, status=201)
         else:
-            logger.debug('INVALID DATA')
-            return Response('INVALID DATA', status=400)
+            logger.debug('error: {}'.format(serializer.errors))
+            return Response('Invalid Request', status=400)
 
-        return Response('UNKNOWN FAILURE', status=500)
+        return Response('Unknown Issue', status=500)
 
-    # PUT - /{pk}
+    # PUT /{pk}
     def update(self, request, pk=None):
-        logger.debug('--ViewUpdate:\t{}'.format(pk))
-
-        serializer = self.get_serializer_class()
+        logger.info('Update:\t{}'.format(pk))
 
         # Get the model instance or try to create the object
         try:
-            instance = self.Tmp.model.objects.get(pk=pk)
-            logger.debug('TESTER: {}'.format(instance))
+            instance = self.getObject(pk=pk)
+            logger.debug('primary key found')
         except Exception as e:
-            return Response(str(e), status=403)
+            logger.debug('primary key not found')
             self.create(request)
 
-        # Update the instance we found
+        # Pull request data
         req_data = request.data
-        serializer = self.get_serializer_class()(data=req_data)
-        instance = serializer.update(instance,req_data)
-        instance.save()
-        logger.debug('INST -- {}'.format(instance.__dict__))
+        logger.debug('request_data: {}'.format(req_data))
 
-        return Response(self.get_serializer_class()(instance), status=203)
-
-    def destroy(self, request, pk=None):
-        logger.debug('--Destroy: {}'.format(pk))
+        # Update the instance with the request data
+        # Need validation here...
         try:
-            post = self.get_serializer_class().Meta.objects.get(pk=pk).delete()
-        except TypeError as t:
-            logger.debug('\tInstance does not exist: {}'.format(pk))
-            return Response({'warning': 'pk does not exist: {}'.format(pk)})
+            serializer = self.get_serializer_class()(data=req_data)
+            instance = serializer.update(instance,req_data)
+            instance.save()
         except Exception as e:
-            logger.debug('\tDestroy Error: {}'.format(e))
-            return Response({'error': e}, status=500)
-        else:
-            return Response({'post_id': pk}, status=200)
+            logger.debug('error: {}'.format(e))
+            return Response('Request Failure',status=500)
+
+        return Response(self.get_serializer_class()(instance).data, status=203)
+
+    # delete /{pk}
+    def destroy(self, request, pk=None):
+        logger.info('Destroy: {}'.format(pk))
+
+        # Delete object or fail
+        try:
+            instance = self.getObject(pk=pk)
+            instance.delete()
+        except TypeError as t:
+            logger.debug('pk does not exist')
+            return Response('HTTP 404',status=404)
+        except Exception as e:
+            logger.error('error: {}'.format(e))
+            return Response('Request failure', status=500)
+
+        return Response(self.get_serializer_class()(instance).data, status=200)
 
 class PostViewSet(BaseViewSet):
-    logger.debug('Enter: {}'.format('PostViewSet'))
+    logger.info('Initiating: {}'.format('PostViewSet'))
 
     class Tmp:
         model = Post
@@ -103,149 +108,12 @@ class PostViewSet(BaseViewSet):
     serializer_class = eval('{}Serializer'.format(Tmp.model.__name__))
     queryset = serializer_class.Meta.model.objects.all()
 
-# class PostViewSet(viewsets.ModelViewSet):
-#     logger.debug('Enter: {}'.format('PostViewSet'))
-#     queryset = Post.objects.all()
-#     serializer_class = PostSerializer
-#     authentication_classes = (TokenAuthentication,SessionAuthentication,)
-#     permission_classes = (IsAuthenticated,)
-#
-#     # GET - post/
-#     def list(self,request):
-#         logger.debug('--List: {}'.format('posts'))
-#
-#         serializer = self.get_serializer_class()(self.get_queryset(), many=True)
-#         return Response(serializer.data)
-#
-#     # GET - post/{pk}
-#     def retrieve(self, request, pk=None):
-#         logger.debug('--Retrieve pk: {}'.format(pk))
-#         post = get_object_or_404(self.get_queryset(),pk=pk)
-#         return Response(self.get_serializer_class()(post).data)
-#
-#     # POST - post/
-#     def create(self, request):
-#         logger.debug('--Create: {}'.format(request.data))
-#         request.data['post_id'] = self.queryset.count() + 1
-#         serializer = self.get_serializer_class()(data=request.data)
-#         if serializer.is_valid():
-#             logger.debug('Instance Is Valid')
-#             instance = serializer.save()
-#             instance.save()
-#             logger.debug('INSTANCE: {}'.format(instance.__dict__))
-#             return Response(serializer.data, status=201)
-#         else:
-#             logger.debug('Instance Is Invalid')
-#             logger.debug(serializer.errors)
-#             return Response(serializer.errors, status=400)
-#
-#     # PUT - post/{pk}
-#     def update(self, request, pk=None):
-#         logger.debug('--Update: {}'.format(pk))
-#         try:
-#             post = Post.objects.get(pk=pk)
-#         except Exception as e:
-#             logger.debug(e)
-#             return self.create(request)
-#         serializer = self.get_serializer_class()(data=request.data,partial=True)
-#         if serializer.is_valid():
-#             instance = serializer.update(instance=post,validated_data=request.data)
-#             serializer.save()
-#             return self.retrieve(request,pk=pk)
-#         else:
-#             logger.debug('SERIALIZER: {}'.format('invalid'))
-#             logger.debug(serializer.errors)
-#             return Response(serializer.errors, status=400)
-#
-#     def destroy(self, request, pk=None):
-#         logger.debug('--Destroy: {}'.format(pk))
-#         try:
-#             post = Post.objects.get(pk=pk).delete()
-#         except TypeError as t:
-#             logger.debug('Post does not exist: {}'.format(pk))
-#             return Response({'warning': 'pk does not exist: {}'.format(pk)})
-#         except Exception as e:
-#             logger.debug('Destroy Error: {}'.format(e))
-#             return Response({'error': e}, status=500)
-#         else:
-#             return Response({'post_id': pk}, status=200)
 
-    # This is just for custom methods
-    # @action(methods=['get'], detail=False)
-    # def getPost(self,request):
-    #     logger.debug('Enter: {}'.format('method: getPost'))
-    #     newest = self.get_queryset().order_by('pub_date').last()
-    #     serializer = self.get_serializer_class()(newest)
-    #     return Response(serializer.data)
+class CategoryViewSet(BaseViewSet):
+    logger.info('Initiating: {} '.format('CategoryViewSet'))
 
-class CategoryViewSet(viewsets.ModelViewSet):
-    logger.debug('Enter: {} '.format('CategoryViewSet'))
-    queryset = Category.objects.all()
-    serializer_class = CategorySerializer
-    authentication_classes = (TokenAuthentication,SessionAuthentication,)
-    permission_classes = (IsAuthenticated,)
+    class Tmp:
+        model = Category
 
-    def list(self,request):
-        logger.debug('--Get: {}'.format(''))
-        serializer = self.get_serializer_class()(self.get_queryset(), many=True)
-        return Response(serializer.data)
-
-    def retrieve(self,request,pk=None):
-        logger.debug('--Retrieve pk: {}'.format(pk))
-        post = get_object_or_404(self.get_queryset(),pk=pk)
-        return Response(self.get_serializer_class()(post).data)
-
-    def create(self,request):
-        logger.debug('--Create: {}'.format(request.data))
-        request.data['cat_id'] = self.queryset.count() + 1
-        serializer = self.get_serializer_class()(data=request.data)
-        if serializer.is_valid():
-            logger.debug('Instance Is Valid')
-            instance = serializer.save()
-            instance.save()
-            logger.debug('INSTANCE: {}'.format(instance.__dict__))
-            return Response(serializer.data, status=201)
-        else:
-            logger.debug('Instance Is Invalid')
-            return Response(serializer.errors, status=400)
-
-    def update(self,request,pk=None):
-        logger.debug('--Update: {}'.format(pk))
-
-        # Get existing object or create new record
-        try:
-            category = Category.objects.get(pk=pk)
-        except Exception as e:
-            logger.debug(e)
-            return self.create(request)
-
-        # Open our serializer
-        serializer = self.get_serializer_class()(data=request.data,partial=True)
-
-        # Check if serializer is valuid
-        if serializer.is_valid():
-            logger.debug('SERIALIZER: {}'.format('valid'))
-
-            # update the instance
-            instance = serializer.update(instance=category,validated_data=request.data)
-            logger.debug('INSTANCE: {}'.format(instance))
-
-            # Save the serializer
-            serializer.save()
-            return Response(serializer.data, status=200)
-        else:
-            logger.debug('SERIALIZER INVALID: {}'.format(serializer.errors))
-            return Response(serializer.errors, status=400)
-
-    def destroy(self,request,pk=None):
-        logger.debug('--Destroy: {}'.format(pk))
-        try:
-            post = Category.objects.get(pk=pk).delete()
-        except TypeError as t:
-            logger.debug('Post does not exist: {}'.format(pk))
-            return Response({'warning': 'pk does not exist: {}'.format(pk)})
-        except Exception as e:
-            logger.debug('Destroy Error: {}'.format(e))
-            return Response({'error': e}, status=500)
-        else:
-            return Response({'cat_id': pk}, status=200)
+    serializer_class = eval('{}Serializer'.format(Tmp.model.__name__))
+    queryset = serializer_class.Meta.model.objects.all()
