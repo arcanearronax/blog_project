@@ -7,6 +7,7 @@ from django.shortcuts import get_object_or_404
 from .models import Category, Post
 from .forms import CatForm, PostForm, LoginForm
 from .serializers import CategorySerializer, PostSerializer, BaseSerializer
+from rest_framework.exceptions import APIException
 import logging
 
 logger = logging.getLogger(__name__)
@@ -22,7 +23,12 @@ class BaseViewSet(viewsets.ModelViewSet):
 
     # Use this to get the model instance with the primary key
     def getObject(self,pk):
-        return self.Tmp.model.objects.get(pk=pk)
+        try:
+            return self.Tmp.model.objects.get(pk=pk)
+        except Exception as e:
+            logger.error('error: {}'.format(e))
+            raise APIException('Object not found: {}'.format(pk))
+
 
     # GET (all objects)
     def list(self,request):
@@ -32,7 +38,13 @@ class BaseViewSet(viewsets.ModelViewSet):
     # GET (single object) /{pk}
     def retrieve(self,request,pk=None):
         logger.info('Retrieve:\t{}'.format(pk))
-        return Response(self.get_serializer_class()(self.getObject(pk)).data)
+        try:
+            return Response(self.get_serializer_class()(self.getObject(pk)).data)
+        except APIException as a:
+            return Response('Object not found: {}'.format(pk),status=404)
+        except Exception as e:
+            logger.error('{}'.format(e))
+            return Response('Unknown Server Error',status=500)
 
     # POST
     def create(self,request):
@@ -46,7 +58,11 @@ class BaseViewSet(viewsets.ModelViewSet):
         # Validate the serializer and save the instance or fail
         serializer = self.get_serializer_class()(data=req_data)
         if serializer.is_valid():
-            serializer.save()
+            try:
+                serializer.save()
+            except Exception as e:
+                logger.error(e)
+                return Response('Object Not Saved',status=500)
             return Response(serializer.data, status=201)
         else:
             logger.debug('error: {}'.format(serializer.errors))
@@ -78,9 +94,9 @@ class BaseViewSet(viewsets.ModelViewSet):
             instance.save()
         except Exception as e:
             logger.debug('error: {}'.format(e))
-            return Response('Request Failure',status=500)
+            return Response('Object Not Updated',status=500)
 
-        return Response(self.get_serializer_class()(instance).data, status=203)
+        return Response(self.get_serializer_class()(instance).data, status=202)
 
     # delete /{pk}
     def destroy(self, request, pk=None):
@@ -90,14 +106,13 @@ class BaseViewSet(viewsets.ModelViewSet):
         try:
             instance = self.getObject(pk=pk)
             instance.delete()
-        except TypeError as t:
-            logger.debug('pk does not exist')
-            return Response('HTTP 404',status=404)
+            return Response(self.get_serializer_class()(instance).data, status=200)
+        except APIException as a:
+            logger.error(a)
+            return Response('Object not found',status=404)
         except Exception as e:
             logger.error('error: {}'.format(e))
             return Response('Request failure', status=500)
-
-        return Response(self.get_serializer_class()(instance).data, status=200)
 
 class PostViewSet(BaseViewSet):
     logger.info('Initiating: {}'.format('PostViewSet'))
