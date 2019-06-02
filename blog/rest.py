@@ -31,6 +31,7 @@ class BaseViewSet(viewsets.ModelViewSet):
 
 
     # GET (all objects)
+    # Not seeing an update in Github
     def list(self,request):
         logger.info('List')
         return Response(self.get_serializer_class()(self.get_queryset(), many=True).data, status=200)
