@@ -49,7 +49,7 @@ class BaseViewSet(viewsets.ModelViewSet):
 
     # POST
     def create(self,request):
-        logger.info('Create:\t{}'.format(request.body))
+        logger.info('Create:\t{}'.format(request.data))
 
         # Add a primary key ID entry to get a valid
         req_data = request.data
@@ -81,7 +81,9 @@ class BaseViewSet(viewsets.ModelViewSet):
             logger.debug('primary key found')
         except Exception as e:
             logger.debug('primary key not found')
-            self.create(request)
+            logger.error(self.Tmp.model._meta.pk)
+            request.data[self.Tmp.model._meta.pk] = pk
+            return self.create(request)
 
         # Pull request data
         req_data = request.data
