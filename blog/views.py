@@ -8,8 +8,94 @@ import logging
 from django.utils.html import escape
 from django.core import serializers
 from django.contrib.auth import authenticate, login, logout
+from django.views import View
 
-logger = logging.getLogger('viewer')
+logger = logging.getLogger(__name__)
+
+class BlogView(View):
+	logger.info('Initiate: BlogView')
+
+	def blogPost(self,request,desc,pk):
+		logger.info('Enter: blogPost')
+		template = loader.get_template('blog_post.html')
+
+		cat = get_object_or_404(Category, desc=desc)
+		post = Post.getPosts(post_id=pk)
+
+		logger.info('cat: {}'.format(cat))
+		logger.info('post: {}'.format(post))
+		context = {
+			'post': post,
+			'cat': cat,
+		}
+		return HttpResponse(template.render(context, request))
+
+	def categoryHome(self,request, desc):
+		logger.info('Enter: categoryHome')
+		template = loader.get_template('blog_category.html')
+
+		cat = get_object_or_404(Category, desc=desc)
+		posts = Post.objects.filter(cat_id=cat.cat_id).order_by('-post_id')
+		try:
+			post = posts[0]
+		except:
+			logger.error('post[0] not found')
+			post = ''
+
+
+		logger.info('postCount: {}'.format(posts.count()))
+		logger.info('cat: {}'.format(cat))
+		logger.info('post: {}'.format(post))
+		context = {
+			'posts': posts,
+			'cat': cat,
+			'post': post,
+		}
+
+		return HttpResponse(template.render(context, request))
+
+	def blogHome(self,request):
+		logger.info('Enter: blogHome')
+		template = loader.get_template('blog_home.html')
+		cats = Category.getCategories()
+		post = Post.objects.get(post_id=int(Post.getPosts().count()))
+
+		logger.debug('post: {}'.format(post))
+		logger.debug('catCount: {}'.format(cats.count()))
+
+		context = {
+			'cats': cats,
+			'post': post,
+		}
+
+		return HttpResponse(template.render(context, request))
+
+	def get(self,request,desc=None,pk=None):
+		logger.info('Enter: {} - {}'.format(desc,pk))
+
+
+		logger.debug(request.path_info)
+		#for k,v in request.__dict__.items():
+		#	logger.debug('req - {}: {}'.format(k,v))
+
+		# Here's where we figure out what to provide the user
+		if desc is None:
+			logger.info('Return Homepage')
+			return self.blogHome(request)
+		elif pk is None:
+			# We have the category
+			try:
+				return self.categoryHome(request,desc)
+			except Exception as e:
+				logger.error('No Category - {}'.format(e.__class__))
+				return HttpResponse('Got:: {}'.format(desc))
+		else:
+			try:
+				return self.blogPost(request,desc,pk)
+			except Exception as e:
+				logger.error('No Post - {}'.format(e.__class__))
+				return HttpResponse('FAILED: {} - {}'.format(desc,pk))
+
 
 def blogHome(request):
 	logger.info('Enter: blogHome')

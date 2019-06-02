@@ -174,7 +174,7 @@ LOGGING = {
             'propagate': True,
 		},
         # Need to update this to blog.views
-        'viewer': {
+        'blog.views': {
             'handlers': ['views-debug','views-info'],
             'level': 'DEBUG',
             'propagate': True,
