@@ -15,7 +15,7 @@
   <a href="{% url 'blogHome' %}"><img src="https://images.pexels.com/photos/34587/pexels-photo.jpg?auto=compress&cs=tinysrgb&h=120&w=120" style="width:100%"></a>
 
   {% for post in posts %}
-    <a href="{% url 'blogPost' desc=cat.desc id=post.post_id %}" class="w3-bar-item w3-button w3-padding-large w3-black">
+    <a href="{% url 'blogPost' desc=cat.desc pk=post.post_id %}" class="w3-bar-item w3-button w3-padding-large w3-black">
       <i class="fa fa-arrow-right w3-xxlarge"></i>
       <p>{{ post.title }}</p>
     </a>

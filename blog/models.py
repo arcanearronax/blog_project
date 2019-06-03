@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils.timezone import now
+import logging
 
 icon_choices = (
 	('calculator', 'fa-calculator'),
@@ -9,7 +10,41 @@ icon_choices = (
 	('default', 'fa-blog'),
 )
 
-class Category(models.Model):
+logger = logging.getLogger('blog.views')
+
+# Just using this for a temporary fix
+class AuxModel():
+
+	@classmethod
+	def count_objects(cls,**kwargs):
+		logger.debug('--Count Objects: {}'.format(cls.__name__))
+		# filter = 'cls.objects'
+		# for k,v in kwargs.items():
+		# 	filter += '.filter({}=\'{}\')'.format(k,v)
+		# logger.debug('filter: {}'.format(filter))
+		# return eval(filter).count()
+		return cls.get_objects(kwargs).count()
+
+	@classmethod
+	def get_objects(cls,order=None,**kwargs):
+		logger.debug('--Get Objects: {}'.format(cls.__name__))
+		filter = 'cls.objects'
+
+		for k,v in kwargs.items():
+			logger.debug('filt--{}: {}'.format(k,v))
+			filter += '.filter({}=\'{}\')'.format(k,v)
+		if order:
+			filter += '.order_by(\'{}\')'.format(order)
+
+		logger.debug('filter: {}'.format(filter))
+		tmp = eval(filter)
+		return tmp
+
+	@classmethod
+	def next_pk(cls):
+		return eval('{}.{}'.format('cls.objects.order_by(\'pk\').last()',cls._meta.pk.name)) + 1
+
+class Category(models.Model, AuxModel):
 	cat_id = models.IntegerField(primary_key=True)
 	desc = models.CharField(max_length=20)
 	hide = models.NullBooleanField(default=False)
@@ -35,7 +70,7 @@ class Category(models.Model):
 			hides=[cat.hide for cat in Category.getCategories(hidden=1).order_by('cat_id')]
 		)
 
-class Post(models.Model):
+class Post(models.Model,AuxModel):
 	post_id = models.IntegerField(primary_key=True)
 	cat = models.ForeignKey(Category, on_delete=models.CASCADE, default=0, db_column='cat_id')
 	title = models.CharField(max_length=100)
@@ -73,3 +108,7 @@ class Post(models.Model):
 			cats=[post.cat.cat_id for post in Post.objects.order_by('post_id')]
 		)
 		return json
+
+	@classmethod
+	def get_cat_desc(cls,pk):
+		return cls.objects.get(pk=pk).cat.desc

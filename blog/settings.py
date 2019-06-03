@@ -132,7 +132,7 @@ LOGGING = {
             'style': '{',
         },
         'tabbed': {
-            'format': '{asctime}-{levelname}:\t{message}',
+            'format': '{asctime}\t{levelname}\t{process:d}\t{thread:d}-\t{message}',
             'style': '{',
         },
     },
@@ -146,7 +146,7 @@ LOGGING = {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
             'filename': '/var/log/django/debug/views.log',
-            'formatter': 'verbose',
+            'formatter': 'tabbed',
         },
         'views-info': {
             'level': 'INFO',

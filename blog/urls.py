@@ -24,17 +24,14 @@ from . import views, rest
 
 urlpatterns = [
     # These are here for legacy support
-    path('', views.blogHome, name='blogHome'),
-    path('login/', views.blogLogin, name='blogLogin'),
-    path('logout/', views.blogLogout, name='blogLogout'),
-    path('admin/', views.blogAdmin, name='blogAdmin'),
-    #path('test/', views.BlogView.as_view()),
-    #path('test/<slug:desc>/', views.BlogView.as_view()),
-    #path('test/<slug:desc>/<int:pk>/', views.BlogView.as_view()),
-    re_path(r'^test/', views.BlogView.as_view()),
+    path('', views.BlogView.as_view(), name='blogHome'),
+    path('login/', views.BlogView.as_view(), name='blogLogin'),
+    path('logout/', views.BlogView.as_view(), name='blogLogout'),
+    path('admin/', views.BlogView.as_view(), name='blogAdmin'),
+    path('test/', views.blogTest, name='blogTest'),
     path('error/', views.blogError, name='blogError'),
     re_path(r'^api/', include('blog.router')),
     path('api-auth/',authviews.obtain_auth_token, name="api-auth"),
-    path('<slug:desc>/', views.categoryHome, name='categoryHome'),
-	path('<slug:desc>/<int:id>/', views.blogPost, name='blogPost'),
+    path('<slug:desc>/', views.BlogView.as_view(), name='categoryHome'),
+	path('<slug:desc>/<int:pk>/', views.BlogView.as_view(), name='blogPost'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
