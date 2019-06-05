@@ -12,99 +12,63 @@ logger = logging.getLogger(__name__)
 class BlogView(View):
 	logger.info('Initiate: BlogView')
 
-	# Displays a single blog post
-	def blogPost(self,request,desc,pk):
-		logger.info('Enter: blogPost')
+	# Class variables, so we don't repeatedly hit the database
+	_cat = Category
+	_post = Post
+	_cat_query = None
+	_post_query = None
+	_cat_obj = None
+	_post_obj = None
 
-		# Get the category
-		cat = Category.objects.get(desc=desc)
-		logger.debug('cat: {}'.format(cat))
-
-		# Get the post
-		post = Post.objects.get(pk=pk)
-		logger.debug('post: {}'.format(post))
-
-		# Make sure the post exists under the category
-		assert post.cat_id == cat.cat_id, 'Incorrect category specified: {} - {}'.format(desc,pk)
-
-		# Render the page
-		template = loader.get_template('blog_post.html')
-		context = {
-			'post': post,
-			'cat': cat,
-		}
-		return HttpResponse(template.render(context, request))
-
-	# Displays the blog category page
-	def categoryHome(self,request, desc):
-		logger.info('Enter: categoryHome')
-
-		# Get the category or bail out
+	@classmethod
+	def get_cat_query(cls,**kwargs):
 		try:
-			cat = Category.objects.get(desc=desc)
-		# In case multiple categories with the same name are found
-		except Category.MultipleObjectsReturned as mor:
-			logger.error('Multiple Categories Found: {}'.format(desc))
-			return HttpResponse('Too Many Categories', status=500)
-		# In case the category does not exist.
-		except Category.DoesNotExist as dne:
-			logger.error('Category Does not Exist: {}'.format(desc))
-			return HttpResponse('Category Does not Exist: {}'.format(desc),status=404)
-		# Whatever other exception could occur
+			return cls._cat_query(**kwargs)
 		except Exception as e:
-			logger.error('Unknown Error - {}'.format(e.__class__))
-			return HttpResponse('Unknown Error', status=500)
+			logger.debug('Blog View: Updating cat_query')
+			logger.error('Exception: {}'.format(e))
+			cls._cat_query = cls._cat.get_objects
+			return cls._cat_query(**kwargs)
 
-		# Get the posts
+	@classmethod
+	def get_post_query(cls,**kwargs):
 		try:
-			posts = Post.get_objects(cat_id=cat.cat_id,order='-post_id')
-			logger.debug('posts = {}'.format(posts))
-			post = posts[0]
+			return cls._post_query(**kwargs)
 		except Exception as e:
-			logger.error('posts[0]: {}'.format(e))
-			return self.blogHome(request)
+			logger.debug('Blog View: Updating post_query')
+			logger.error('Exception: {}'.format(e))
+			cls._post_query = cls._post.get_objects
+			return cls._post_query(**kwargs)
 
-		# Finalize our info
-		template = loader.get_template('blog_category.html')
-		context = {
-			'posts': posts,
-			'cat': cat,
-			'post': post,
-		}
+	@classmethod
+	def get_cat_obj(cls,**kwargs):
+		logger.debug('Get cat object()')
+		try:
+			return cls._cat_obj(**kwargs)
+		except cls._cat.DoesNotExist as dne:
+			logger.debug('get_cat_obj-dne: {}'.format(dne))
+			raise dne
+		except Exception as e:
+			logger.debug('Blog View: Updating cat_obj')
+			cls._cat_obj = cls._cat.objects.get
+		return cls.get_cat_obj(**kwargs)
 
-		return HttpResponse(template.render(context, request))
-
-	# Display the blog homepage
-	def blogHome(self,request):
-		logger.info('Enter: blogHome')
-
-		# Get the categories
-		cats = Category.getCategories()
-		logger.debug('catCount: {}'.format(cats.count()))
-
-		# Get a post to display
-		post = Post.objects.get(post_id=int(Post.getPosts().count()))
-		logger.debug('post: {}'.format(post))
-
-		# Render the page
-		template = loader.get_template('blog_home.html')
-		context = {
-			'cats': cats,
-			'post': post,
-		}
-		return HttpResponse(template.render(context, request))
+	@classmethod
+	def get_post_obj(cls,**kwargs):
+		logger.debug('Get post objects()')
+		try:
+			return cls._post_obj(**kwargs)
+		except cls._post.DoesNotExist as dne:
+			logger.debug('get_post_obj-dne: {}'.format(dne))
+			raise Exception('Post not found: {}'.format(kwargs))
+		except Exception as e:
+			logger.debug('Blog View: Updating post_obj')
+			cls._post_obj = cls._post.objects.get
+		return cls.get_post_obj(**kwargs)
 
 	# Use this to render login page
 	def blogLogin(self,request):
 		logger.info('Enter: blogLogin-UPDATED')
-
-		# Get Categories
-		cats = Category.getCategories(hidden=0)
-		logger.debug('catCount: {}'.format(cats.count()))
-
-		# Get post
-		post = Post.objects.get(post_id=int(Post.getPosts().count()))
-		logger.debug('post: {}'.format(post))
 
 		# Get login form
 		loginForm = LoginForm()
@@ -112,8 +76,8 @@ class BlogView(View):
 		# Render the page
 		template = loader.get_template('blog_login.html')
 		context = {
-			'cats': cats,
-			'post': post,
+			'cats': BlogView.get_cat_query(hide=0),
+			'post': BlogView.get_post_obj(post_id=BlogView._post.count_objects()),
 			'form': loginForm,
 		}
 		return HttpResponse(template.render(context, request))
@@ -136,21 +100,16 @@ class BlogView(View):
 		logger.info('Enter: blogAdmin')
 		logger.debug('REQUEST: {}'.format(request.POST))
 
-		template = loader.get_template('blog_admin.html')
-		cats = Category.objects.all().order_by('cat_id')
-		posts = Post.objects.order_by('post_id')
+
+		cats = BlogView.get_cat_query(order='cat_id')
+		posts = BlogView.get_post_query(order='post_id')
 
 		pForm = PostForm()
 		pForm.id = -1
 		cForm = CatForm()
 		cForm.id = -1
 
-		try:
-			logger.info('postCount: {}'.format(posts.count()))
-			logger.info('catCount: {}'.format(cats.count()))
-		except:
-			logger.info('Failed to log info')
-
+		template = loader.get_template('blog_admin.html')
 		context = {
 			'cats': cats,
 			'posts': posts,
@@ -162,6 +121,15 @@ class BlogView(View):
 			'cForm': cForm,
 		}
 
+		return HttpResponse(template.render(context, request))
+
+	def blogError(self,request,error):
+		logger.info('Enter Blog Error')
+		logger.error('  --{}'.format(error))
+		template = loader.get_template('blog_error.html')
+		context = {
+			'error': error
+		}
 		return HttpResponse(template.render(context, request))
 
 	# This is responsible for handling any get requests
@@ -177,37 +145,64 @@ class BlogView(View):
 		if request.path_info == '/admin/':
 			return self.blogAdmin(request)
 
-		# If don't have desc, display the homepage
+		# Below here is where we generate the normal blog pages
+
+		# Let's gather up commonly used vars
+
+
+		# Auxilliary
+		error = None
+
+		# If we don't have desc, display the homepage
 		if desc is None:
-			return self.blogHome(request)
+			logger.debug('Return Homepage')
+			template = loader.get_template('blog_home.html')
+			context = {
+				'cats': BlogView.get_cat_query(hide=0,order='cat_id')
+			}
 
 		# If we don't have pk, display the category page
 		elif pk is None:
-			# We Return the category page or 404
+			logger.debug('Return Category Page')
 			try:
-				return self.categoryHome(request,desc)
-			# Whatever failure could occur
-			except Exception as e:
-				logger.error('No Category: {}'.format(e))
-				return HttpResponse('No Category: {}'.format(desc),status=404)
+				cat = BlogView.get_cat_obj(desc=desc,hide=0)
+				posts = BlogView.get_post_query(cat_id=cat.cat_id,order='-post_id')
+				post = BlogView.get_post_query(cat_id=cat.cat_id).last()
+			except Exception as error:
+				#error = e
+				logger.error('Caught in GET: {}'.format(error))
+				return HttpResponse(error)
+			else:
+				template = loader.get_template('blog_category.html')
+				context = {
+					'posts': BlogView.get_post_query(cat_id=cat.cat_id,order='-post_id'),
+					'cat': cat,
+					'post': BlogView.get_post_query(cat_id=cat.cat_id).last(),
+					'error': error,
+				}
 
 		# We have desc and pk, so display the the blogpage
 		else:
-			# We return the post page or 404
+			logger.debug('Return Post Page')
 			try:
-				return self.blogPost(request,desc,pk)
-			# In case the pk doesn't exist under the category
-			except AssertionError as a:
-				logger.error('Cat post mismatch - {}'.format(a))
-				return HttpResponse('Category-Post conflict: {} - {}'.format(desc,pk), status=406)
-			# In case the category doesn't exist
-			except Category.DoesNotExist as dne:
-				logger.error('Category Does not Exist: {}'.format(desc))
-				return HttpResponse('Category Does not Exist: {}'.format(desc))
-			# Whatever other failure could occur
-			except Exception as e:
-				logger.error('Unknown Failure - {}'.format(e))
-				return HttpResponse('Unknown Failure: {} - {}'.format(desc,pk))
+				cat = BlogView.get_cat_obj(desc=desc,hide=0)
+				post = BlogView.get_post_obj(pk=pk)
+			except Exception as error:
+				logger.error('Caught Exception in GET: {}'.format(error))
+				return self.blogError(request,error)
+			assert post.cat_id == cat.cat_id, 'Incorrect category specified: {} - {}'.format(desc,pk)
+			template = loader.get_template('blog_post.html')
+			context = {
+				'post': post,
+				'cat': cat,
+
+			}
+
+
+		# Building a new means to render pages
+		logger.debug('CONTEXT - {}'.format(context))
+		return HttpResponse(template.render(context, request))
+
 
 	# Process POST requests - admin page
 	def post(self,request):
@@ -323,7 +318,7 @@ class BlogView(View):
 			# we're updating a category
 			else:
 				logger.debug('Cat form is invalid')
-				
+
 				# Initialize and update the category
 				logger.debug('GOT ID: {}'.format(request.POST.get('cat_id')))
 				cat = Category.objects.get(cat_id=int(request.POST.get('cat_id'))+1)
@@ -393,10 +388,6 @@ class BlogView(View):
 				# Cat failed
 				return HttpResponse('Failed Category')
 
-
-
-def blogError(request):
-	return HttpResponse('You got an error.')
 
 # Using this to test new features
 def blogTest(request):

@@ -30,9 +30,12 @@ class AuxModel():
 		logger.debug('--Get Objects: {}'.format(cls.__name__))
 		filter = 'cls.objects'
 
-		for k,v in kwargs.items():
-			logger.debug('filt--{}: {}'.format(k,v))
-			filter += '.filter({}=\'{}\')'.format(k,v)
+		if kwargs:
+			for k,v in kwargs.items():
+				logger.debug('filt--{}: {}'.format(k,v))
+				filter += '.filter({}=\'{}\')'.format(k,v)
+		else:
+			filter += '.all()'
 		if order:
 			filter += '.order_by(\'{}\')'.format(order)
 
@@ -69,6 +72,12 @@ class Category(models.Model, AuxModel):
 			descs=[cat.desc for cat in Category.getCategories(hidden=1).order_by('cat_id')],
 			hides=[cat.hide for cat in Category.getCategories(hidden=1).order_by('cat_id')]
 		)
+
+	@classmethod
+	def get_pk_by_desc(cls,desc):
+		tmp = cls.objects.get(desc=desc).cat_id
+		logger.debug('pk_by_desc: {}'.format(tmp))
+		return cls.objects.get(desc=desc).cat_id
 
 class Post(models.Model,AuxModel):
 	post_id = models.IntegerField(primary_key=True)

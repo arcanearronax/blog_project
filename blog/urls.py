@@ -24,12 +24,12 @@ from . import views, rest
 
 urlpatterns = [
     # These are here for legacy support
+    # Need to deal with this duplication
     path('', views.BlogView.as_view(), name='blogHome'),
     path('login/', views.BlogView.as_view(), name='blogLogin'),
     path('logout/', views.BlogView.as_view(), name='blogLogout'),
     path('admin/', views.BlogView.as_view(), name='blogAdmin'),
     path('test/', views.blogTest, name='blogTest'),
-    path('error/', views.blogError, name='blogError'),
     re_path(r'^api/', include('blog.router')),
     path('api-auth/',authviews.obtain_auth_token, name="api-auth"),
     path('<slug:desc>/', views.BlogView.as_view(), name='categoryHome'),
