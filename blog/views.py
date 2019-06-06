@@ -4,6 +4,8 @@ from django.shortcuts import redirect
 from .models import Post, Category
 from .forms import PostForm, CatForm, LoginForm
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from django.views import View
 import logging
 
@@ -12,6 +14,8 @@ logger = logging.getLogger(__name__)
 class BlogView(View):
 	logger.info('Initiate: BlogView')
 
+	user = User()
+
 	# Class variables, so we don't repeatedly hit the database
 	_cat = Category
 	_post = Post
@@ -19,6 +23,10 @@ class BlogView(View):
 	_post_query = None
 	_cat_obj = None
 	_post_obj = None
+
+	_post_form = PostForm
+	_cat_form = CatForm
+	_login_form = LoginForm
 
 	@classmethod
 	def get_cat_query(cls,**kwargs):
@@ -66,12 +74,41 @@ class BlogView(View):
 			cls._post_obj = cls._post.objects.get
 		return cls.get_post_obj(**kwargs)
 
+	@classmethod
+	def get_post_form(cls,**kwargs):
+		logger.debug('Get post form')
+		try:
+			return cls._post_form(**kwargs)
+		except Exception as e:
+			logger.error('get_post_form-error: {}').format(e)
+			raise Exception('Form Exception: {}'.format(e))
+		return None
+
+	@classmethod
+	def get_cat_form(cls,**kwargs):
+		logger.debug('Get cat form')
+		try:
+			return cls._cat_form(**kwargs)
+		except Exception as e:
+			logger.error('get_cat_form-error: {}'.format(e))
+			raise Exception('Form Exception: {}'.format(e))
+
+	@classmethod
+	def get_login_form(cls,*args,**kwargs):
+		logger.debug('Get login form')
+		logger.debug('kwargs: {}'.format(kwargs))
+		try:
+			return cls._login_form(*args,**kwargs)
+		except Exception as e:
+			logger.error('get_login_form-error: {}'.format(e))
+			raise Exception('Form Exception: {}'.format(e))
+
 	# Use this to render login page
-	def blogLogin(self,request):
+	def blogLogin(self,request,error):
 		logger.info('Enter: blogLogin-UPDATED')
 
 		# Get login form
-		loginForm = LoginForm()
+		loginForm = BlogView.get_login_form()
 
 		# Render the page
 		template = loader.get_template('blog_login.html')
@@ -80,36 +117,37 @@ class BlogView(View):
 			'post': BlogView.get_post_obj(post_id=BlogView._post.count_objects()),
 			'form': loginForm,
 		}
-		return HttpResponse(template.render(context, request))
+		#return HttpResponse(template.render(context, request))
+		return template,context,error
 
 	# Use this to process user logout
-	def blogLogout(self,request):
+	def blogLogout(self,request,error):
 		logger.info('Enter Blog Logout-UPDATED')
 
 		# Let django handle the logout
-		logout(request)
+		try:
+			logout(request)
+		except Exception as error:
+			logger.error('Logout-error: {}'.format(error))
+
 
 		# Render the logout page
 		template = loader.get_template('blog_logout.html')
 		context = {
 
 		}
-		return HttpResponse(template.render(context, request))
+		return template,context,error
 
-	def blogAdmin(self,request):
+	@login_required(login_url='/login/')
+	def blogAdmin(self,request,error):
 		logger.info('Enter: blogAdmin')
-		logger.debug('REQUEST: {}'.format(request.POST))
 
-
-		cats = BlogView.get_cat_query(order='cat_id')
-		posts = BlogView.get_post_query(order='post_id')
-
-		pForm = PostForm()
-		pForm.id = -1
-		cForm = CatForm()
-		cForm.id = -1
-
-		template = loader.get_template('blog_admin.html')
+		try:
+			cats = BlogView.get_cat_query(order='cat_id')
+			posts = BlogView.get_post_query(order='post_id')
+			template = loader.get_template('blog_admin.html')
+		except Exception as error:
+			logger.error('blogAdmin-error: {}'.format(error))
 		context = {
 			'cats': cats,
 			'posts': posts,
@@ -117,11 +155,12 @@ class BlogView(View):
 			'ccnt': cats.count(),
 			'post_json': Post.get_json(),
 			'cat_json': Category.get_json(),
-			'pForm': pForm,
-			'cForm': cForm,
+			'pForm': BlogView.get_post_form(),
+			'cForm': BlogView.get_cat_form(),
 		}
 
-		return HttpResponse(template.render(context, request))
+		#return HttpResponse(template.render(context, request))
+		return template,context,error
 
 	def blogError(self,request,error):
 		logger.info('Enter Blog Error')
@@ -137,24 +176,27 @@ class BlogView(View):
 		logger.info('Enter Get: {} - {}'.format(desc,pk))
 		logger.debug('path_info: {}'.format(request.path_info))
 
-		# This is being used as a temp solution to process non-category requests
-		if request.path_info == '/login/':
-			return self.blogLogin(request)
-		if request.path_info == '/logout/':
-			return self.blogLogout(request)
-		if request.path_info == '/admin/':
-			return self.blogAdmin(request)
-
-		# Below here is where we generate the normal blog pages
-
-		# Let's gather up commonly used vars
-
-
-		# Auxilliary
+		# Use this is a temp solution
+		template = None
+		context = None
 		error = None
 
+		# This is being used as a temp solution to process non-category requests
+		if request.path_info == '/login/':
+			template,context,error = self.blogLogin(request,error)
+		elif request.path_info == '/logout/':
+			template,context,error = self.blogLogout(request,error)
+		elif request.path_info == '/admin/':
+			logger.info('Requested Admin Page')
+			try:
+				logger.debug('Can we enter admin?')
+				template,context,error = self.blogAdmin(request,error)
+				logger.debug('Yep, we can')
+			except Exception as error:
+				logger.debug('We cannot: {}'.format(error))
+				template,context,error = self.blogError(request,error)
 		# If we don't have desc, display the homepage
-		if desc is None:
+		elif desc is None:
 			logger.debug('Return Homepage')
 			template = loader.get_template('blog_home.html')
 			context = {
@@ -171,7 +213,7 @@ class BlogView(View):
 			except Exception as error:
 				#error = e
 				logger.error('Caught in GET: {}'.format(error))
-				return HttpResponse(error)
+				return self.blogError(request,error)
 			else:
 				template = loader.get_template('blog_category.html')
 				context = {
@@ -220,13 +262,13 @@ class BlogView(View):
 				# Authenticate user credentials
 				uservalue = form.cleaned_data.get("username")
 				passwordvalue = form.cleaned_data.get("password")
-				user = authenticate(username=uservalue, password=passwordvalue)
+				BlogView.user = authenticate(username=uservalue, password=passwordvalue)
 
 				# The user is valid
-				if user is not None: #The user is valid
-					login(request, user)
-					logger.info('User authenticated: {}'.format(user))
-					return user
+				if BlogView.user is not None: #The user is valid
+					login(request, BlogView.user)
+					logger.info('User authenticated: {}'.format(BlogView.user))
+					return True
 
 			# Something wasn't right
 			return None
@@ -290,6 +332,8 @@ class BlogView(View):
 		def processCategory(form,request):
 			logger.debug('Enter: processCategory')
 
+			error = None
+
 			# validate the form, new posts go here
 			if form.is_valid():
 				logger.debug('Cat form is valid')
@@ -341,10 +385,11 @@ class BlogView(View):
 
 		# Is this for a login form?
 		if request.path_info == '/login/':
+			logger.info('Received Login Request')
 
 			# Create our form object
-			form = LoginForm(request.POST or None)
-			logger.info('Received Login Request')
+			logger.debug('Calling login form')
+			form = BlogView.get_login_form(request.POST)
 
 			# Authenticate the user
 			if processUser(form,request):
@@ -387,27 +432,3 @@ class BlogView(View):
 
 				# Cat failed
 				return HttpResponse('Failed Category')
-
-
-# Using this to test new features
-def blogTest(request):
-	template = loader.get_template('blog_test.html')
-	cats = Category.getCategories(hidden=1)
-	posts = Post.getPosts(hidden=1)
-
-	pForm = PostForm()
-	pForm.id = -1
-	cForm = CatForm()
-	cForm.id = -1
-
-	context = {
-		'cats': cats,
-		'posts': posts,
-		'pcnt': posts.count(),
-		'ccnt': cats.count(),
-		'post_json': Post.get_json(),
-		'cat_json': Category.get_json(),
-		'pForm': pForm,
-		'cForm': cForm,
-	}
-	return HttpResponse(template.render(context, request))
