@@ -186,3 +186,6 @@ LOGGING = {
         },
 	},
 }
+
+# Adding this to work on login_required
+LOGIN_URL='/login/'

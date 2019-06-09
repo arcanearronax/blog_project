@@ -4,15 +4,29 @@
   <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
 {% endblock %}
 
-{% block navbar %}
-  <p>Navbar</p>
+{% block titlebar %}
+<div id="title_bar">
+  <ul class="title-bar">
+    <li><a href="{% url 'blogHome' %}">Blog Home</a></li>
+    <li><a href="{% url 'blogLogin' %}">Blog Login</a></li>
+    <li><a href="{% url 'blogAdmin' %}">Blog Admin</a></li>
+    <li><a href="{% url 'blogHome' %}">Blog Home</a></li>
+  </ul>
+</div>
 {% endblock %}
+
+{% block navbar %}
+  <a href="https://arcanedomain.duckdns.org/" class="w3-bar-item w3-button" style="width:25% !important">HOME</a>
+  <a href="{% url 'blogHome' %}" class="w3-bar-item w3-button" style="width:25% !important">BLOG</a>
+  <a href="{% url 'blogHome' %}" class="w3-bar-item w3-button" style="width:25% !important">HOME</a>
+  <a href="#" class="w3-bar-item w3-button" style="width:25% !important">TOP</a>
+{% endblock %}
+
+{% block image_link %}{% url 'blogHome' %}{% endblock %}
 
 {% block sidebar %}
 
   <!-- Replace with a blog icon -->
-  <!-- https://www.pexels.com/photo/coffee-notebook-pen-writing-34587/ -->
-  <a href="{% url 'blogHome' %}"><img src="https://images.pexels.com/photos/34587/pexels-photo.jpg?auto=compress&cs=tinysrgb&h=120&w=120" style="width:100%"></a>
 
   {% for post in posts %}
     <a href="{% url 'blogPost' desc=cat.desc pk=post.post_id %}" class="w3-bar-item w3-button w3-padding-large w3-black">
@@ -20,7 +34,7 @@
       <p>{{ post.title }}</p>
     </a>
     {% empty %}
-    No Categories
+    <p>No Categories</p>
   {% endfor %}
 {% endblock %}
 
@@ -36,18 +50,17 @@
 {% endblock %}
 
 {% block body %}
-  <div class="w3-content w3-justify w3-text-grey w3-padding-64" id="about">
+  <div id="main-posts" class="w3-padding-large w3-content w3-justify w3-text-grey w3-padding-64" id="about">
     {% for post in posts %}
+      <hr>
       <h1>{{ post.title }}</h1>
       <p>{{ post.text }}</p>
-      <hr>
     {% empty %}
       <h1>No Posts</h1>
     {% endfor %}
   </div>
   {% if error %}
-    <p color="red">{{ error }}</p>
+    <p style="color:red; font-weight:bold;">{{ error }}</p>
   {% else %}
-    <p>No Error</p>
   {% endif %}
 {% endblock %}

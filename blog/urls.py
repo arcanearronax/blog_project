@@ -27,7 +27,7 @@ urlpatterns = [
     # Need to deal with this duplication
     path('', views.BlogView.as_view(), name='blogHome'),
     path('login/', login.BlogLogin.as_view(), name='blogLogin'),
-    path('logout/', views.BlogView.as_view(), name='blogLogout'),
+    path('logout/', login.BlogLogout.as_view(), name='blogLogout'),
     path('admin/', views.BlogView.as_view(), name='blogAdmin'),
     re_path(r'^api/', include('blog.router')),
     path('api-auth/',authviews.obtain_auth_token, name="api-auth"),

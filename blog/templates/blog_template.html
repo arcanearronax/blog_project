@@ -2,8 +2,6 @@
 <!DOCTYPE html>
 
 <html>
-	{% block title %}
-	{% endblock %}
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
@@ -11,45 +9,90 @@
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
 	<style>
-		.w3-row-padding img {margin-bottom: 12px}
+		.w3-row-padding img {
+			margin-bottom: 12px
+		}
 		/* Set the width of the sidebar to 120px */
-		.w3-sidebar {width: 150px;background: #222;}
-		/* Add a left margin to the "page content" that matches the width of the sidebar (120px) */
-		#main {margin-left: 150px}
+		.w3-sidebar {
+			width: 150px;
+			background: #222;
+		}
+		/* Add a left margin to the "page content" that matches the width of the sidebar (150px) */
+		#main {
+			margin-left: 150px;
+		}
 		/* Remove margins from "page content" on small screens */
 		@media only screen and (max-width: 600px) {#main {margin-left: 0}}
+
+		/* This is for page specific styling, if any is to be used */
+		{% block pagestyle %}
+		{% endblock %}
+		/* Use this to get the titlebar items to not wrap */
+	  .title-bar {
+	    list-style-type: none;
+	    margin: 0;
+	    padding: 0;
+	    overflow: hidden;
+	    background-color: #000;
+
+	  }
+	  .title-bar li {
+	    float: left;
+	  }
+	  .title-bar li a {
+	    display: inline-block;
+	    color: #FFFFFF;
+	    text-align: center;
+	    padding: 38.75px 12px;
+	    text-decoration: none;
+	  }
+	  .title-bar li a:hover {
+	    background-color: #222;
+	  }
+	  .title-bar img {
+	    width: 150px;
+
+	  }
 	</style>
 
   <head>
-		<link rel="stylesheet" type="text/css" href="static/WebpageStyle.css">
+		<link rel="stylesheet" type="text/css" href="/static/WebpageStyle.css">
 		{% block javascript %}
 		{% endblock %}
 	</head>
 
 	<body class="w3-black">
 
-		<!-- Icon Bar (Sidebar - hidden on small screens) -->
-		<nav class="w3-sidebar w3-bar-block w3-small w3-hide-small w3-center">
-
-			<!-- Put the sidebar items here -->
-  		{% block sidebar %}
-			{% endblock %}
-
-		</nav>
-
 		<!-- Navbar on small screens (Hidden on medium and large screens) -->
-		<div class="w3-top w3-hide-large w3-hide-medium" id="myNavbar">
+		<div id="navbar-mobile" style="position:sticky;" class="w3-top w3-hide-large w3-hide-medium">
+			<!-- Need to spend time testing on smaller screens -->
   		{% block navbar %}
 			{% endblock %}
 		</div>
 
-		<!-- Page Content -->
-		<div class="w3-padding-large w3-left" id="main">
+		<!-- Sidebar (hidden on small screens) -->
+		<nav id="sidebar" class="w3-sidebar w3-bar-block w3-small w3-hide-small w3-center" style="position:relative;">
+			<!-- Figure out if there's a nicer way to handle this -->
+			<a href={% block image_link %}{% endblock %}><img style="width:100%;" src="https://images.pexels.com/photos/34587/pexels-photo.jpg?auto=compress&cs=tinysrgb&h=120&w=120"></a>
+			<!-- Let the individual pages dictate the items in the sidebar -->
+			{% block sidebar %}
+			{% endblock %}
+
+		</nav>
+
+		<!-- Page Content (What the pages have the most control over) -->
+		<div id="main" style="position:absolute;">
+
+			<!-- Horizontal navbar at the top of the page -->
+			<!-- Need to make this freeze at the top of the window -->
+			{% block titlebar %}
+			{% endblock %}
 
 			<!-- Header/Home -->
   		{% block header %}
 			{% endblock %}
 
+			<!-- This stuff is displayed below the page header and right of the sidebar -->
 			{% block body %}
 			{% endblock %}
 

@@ -65,21 +65,44 @@ class BlogLogin(LoginView):
         logger.debug('Calling login form')
         try:
             form = LoginForm(request.POST)
+            user = processUser(form,request)
         except Exception as e:
             logger.error('login-error - {}'.format(e))
+            # Need to figure out a proper way to redirect
+            template = loader.get_template(self.template_name)
+            context = {
+                'form': LoginForm(),
+                'error': 'Error processing user',
+            }
+            return HttpResponse(template.render(context, request))
         else:
-            user = processUser(form,request)
-            logger.debug('login successful: {}'.format(user))
-            return redirect('blogAdmin')
+            if user:
+                logger.debug('login successful: {}'.format(user))
+                return redirect('blogAdmin')
+            else:
+                logger.debug('login failed: {}'.format(user))
+                # Need to figure out a proper way to redirect
+                template = loader.get_template(self.template_name)
+                context = {
+                    'form': LoginForm(),
+                    'error': 'Username and/or password is invalid',
+                }
+                return HttpResponse(template.render(context, request))
 
         # Authentication failed
-        return HttpResponse('Failed to authenticate')
+        # Need to figure out a proper way to redirect
+        template = loader.get_template(self.template_name)
+        context = {
+            'form': LoginForm(),
+            'error': 'Failed to authenticate user',
+        }
+        return HttpResponse(template.render(context, request))
 
 class BlogLogout(LogoutView):
     logger.info('Initializing: BlogLogout')
 
     next_page = '/'
-    template_name = 'blog_logout.html'
+    #template_name = 'blog_logout.html'
     redirect_field_name = 'blogLogout'
 
     def get(self,request):
