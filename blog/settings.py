@@ -166,6 +166,18 @@ LOGGING = {
             'filename': '/var/log/django/rest.log',
             'formatter': 'simple',
         },
+        'game-info': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': '/var/log/django/game.log',
+            'formatter': 'simple',
+        },
+        'game-debug': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': '/var/log/django/debug/game.log',
+            'formatter': 'simple',
+        },
 	},
 	'loggers': {
 		'django': {
@@ -181,6 +193,11 @@ LOGGING = {
         },
         'blog.rest': {
             'handlers': ['rest-debug','rest-info'],
+            'level': 'DEBUG',
+            'propogate': True,
+        },
+        'blog.blackjack.game_api': {
+            'handlers': ['game-debug','game-info'],
             'level': 'DEBUG',
             'propogate': True,
         },

@@ -19,6 +19,7 @@ from django.conf import settings
 from django.conf.urls import include
 from django.conf.urls.static import static
 from rest_framework.authtoken import views as authviews
+from .blackjack.game_api import GameViewSet
 
 from . import views, rest, login
 
@@ -31,6 +32,7 @@ urlpatterns = [
     path('admin/', views.BlogView.as_view(), name='blogAdmin'),
     re_path(r'^api/', include('blog.router')),
     path('api-auth/',authviews.obtain_auth_token, name="api-auth"),
+    path('game/',GameViewSet.as_view(),name='blackjack'),
     path('<slug:desc>/', views.BlogView.as_view(), name='categoryHome'),
 	path('<slug:desc>/<int:pk>/', views.BlogView.as_view(), name='blogPost'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
