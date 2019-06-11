@@ -5,3 +5,5 @@ class BlackJackForm(forms.Form):
     player = forms.CharField(label='player',max_length=10)
     bet_amount = forms.CharField(widget=forms.TextInput(attrs={'type':'number'}))
     selection = forms.CharField(label='selection')
+    phase = forms.CharField(label='game_phase')
+    chips = forms.CharField(label='chips')

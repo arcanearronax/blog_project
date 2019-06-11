@@ -1,6 +1,9 @@
 from .card_deck import PlayingCardDeck
 from .player import BlackJackPlayer, BlackJackDealer
 from .exceptions import GameException
+import logging
+
+logger = logging.getLogger('blog.blackjack.game_api')
 
 class BlackJackGame():
 
@@ -12,9 +15,12 @@ class BlackJackGame():
         self.pool = 0
         self.bets = {}
 
+    def add_player(self,player):
+        self.players[player.get_name()] = player
+
     def add_players(self,*args):
         for player in args:
-            self.players[player.get_name()] = player
+            self.add_player(player)
 
     def get_players(self):
         return self.players
@@ -52,7 +58,9 @@ class BlackJackGame():
     # This is responsible for running the game
     def main(self):
 
-        # Initialize the game
+        # Initialize the gamephase = game.phase_id
+        player = game.player
+        bet_
         p1 = BlackJackPlayer('name1',50)
         p2 = BlackJackPlayer('name2',50)
         self.add_players(p1,p2)
@@ -70,6 +78,18 @@ class BlackJackGame():
         # Check for next move
         self.next_round()
 
-game = BlackJackGame(101,2)
+    def start_game(self,game):
+        logger.debug('Enter: start_game')
 
-game.main()
+        self.game.add_player(BlackJackPlayer(game.player,game.chips))
+
+
+    # Use this to comunicate with the API
+    def process_action(self,game):
+        logger.debug('ACTION: {}'.format(game))
+
+        phase = game.phase
+        if phase == 'start':
+            self.start_game(game)
+        elif phase == 'betting':
+            logger.debug('Betting')

@@ -3,6 +3,7 @@ from django.template import loader
 from django.views import View
 from .game_master import BlackJackGame
 from .form import BlackJackForm
+from .game_action import GameAction
 import logging
 
 logger = logging.getLogger(__name__)
@@ -12,8 +13,7 @@ class GameViewSet(View):
 
     template = loader.get_template('blackjack/index.html')
     form = BlackJackForm
-
-    print(__name__)
+    game = BlackJackGame(1000)
 
     # Give page to user
     def get(self,request):
@@ -26,7 +26,7 @@ class GameViewSet(View):
         }
         return HttpResponse(template.render(context,request))
 
-    # Process form submissions and update accordingly
+    # Process form and update info in game
     def post(self,request):
         logger.info('Enter: GameViewSet-POST')
         logger.debug('game_id={}'.format(request.POST.get('game_id')))
@@ -36,16 +36,26 @@ class GameViewSet(View):
 
         form = BlackJackForm(request.POST)
         if form.is_valid():
-            logger.debug('form is valid')
+            logger.debug('Form is valid')
 
             # Pull in our attributes
-            game = {}
-            game['game_id'] = request.POST.get('game_id')
-            game['player'] = request.POST.get('player')
-            game['selection'] = request.POST.get('selection')
-            game['bet_amount'] = request.POST.get('bet_amount')
+            action = {}
+            action['game_id'] = request.POST.get('game_id')
+            action['player'] = request.POST.get('player')
+            action['selection'] = request.POST.get('selection')
+            action['bet_amount'] = request.POST.get('bet_amount')
+            action['phase'] = request.POST.get('phase')
+
+            # Process game action
+            self.game.process_action(action)
 
         else:
-            game = {'error': 'Form is invalid'}
+            logger.debug('Form is invalid')
+            action = {'error': 'Form is invalid'}
 
-        return JsonResponse(game)
+        context = {
+            'gameform': GameViewSet.form,
+            'game_action': GameAction(request.POST.get('game_id'),request.POST.get('player'),request.POST.get('selection'),request.POST.get('bet_amount'),request.POST.get('game_phase')),
+        }
+
+        return HttpResponse(GameViewSet.template.render(context,request))

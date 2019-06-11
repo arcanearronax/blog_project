@@ -4,7 +4,7 @@
     <h1>Game Template</h1>
 
     <!-- This div contains the BlackJack form itself -->
-    <div id="BlackJackFormDiv" style="display:inherit; float:left">
+    <div id="BlackJackFormDiv" style="display:inherit; float:left;">
       <form method="POST" class="blackjack-form" id="BlackJackForm">
         {% csrf_token %}
         <table>
@@ -19,5 +19,27 @@
         <input type="submit" value="Submit" name="BlackJackReq" id="SubmitButton">
       </form>
     </div>
+
+    <div id="GameResults" style="display:inherit; float:left;">
+
+      {% if game_action %}
+        <table>
+            <tr>
+              <td>{{ game_action.game_id }}</td>
+            </tr>
+            <tr>
+              <td>{{ game_action.player }}</td>
+            </tr>
+            <tr>
+              <td>{{ game_action.selection }}</td>
+            </tr>
+            <tr>
+              <td>{{ game_action.bet_amount }}</td>
+            </tr>
+        </table>
+      {% endif %}
+
+    </div>
+
   </body>
 </html>

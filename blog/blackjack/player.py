@@ -28,6 +28,9 @@ class AbstractPlayer():
     def take_cards(self):
         self.hand.take_cards()
 
+    def do_action(self,action):
+        print('DOING: {}'.format(action))
+
 class BlackJackPlayer(AbstractPlayer):
     _moves_allowed = ('hit','split','double','stay')
 

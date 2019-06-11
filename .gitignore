@@ -1,4 +1,4 @@
-blog/__pycache__
+*__pycache__*
 blog/migrations
 blog/wsgi.py
 
