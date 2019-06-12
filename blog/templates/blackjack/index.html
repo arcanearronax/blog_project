@@ -20,7 +20,7 @@
       </form>
     </div>
 
-    <div id="GameResults" style="display:inherit; float:left;">
+    <div id="GameResults" style="display:inherit; float:bottom;">
 
       {% if game_action %}
         <table>
@@ -34,7 +34,10 @@
               <td>{{ game_action.selection }}</td>
             </tr>
             <tr>
-              <td>{{ game_action.bet_amount }}</td>
+              <td>{{ game_action.chips }}</td>
+            </tr>
+            <tr>
+              <td>{{ game_action.phase }}</td>
             </tr>
         </table>
       {% endif %}

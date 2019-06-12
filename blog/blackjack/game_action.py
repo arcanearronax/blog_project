@@ -2,9 +2,11 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+# Used for game_api and game_master to communicate
 class GameAction():
 
-    _fields = ('game_id','phase','player','selection','bet_amount',)
+    _fields = ('game_id','phase','player','selection','chips','error')
+    _phase = ('create_player','place_bet','deal_hand')
     _actions = ('start','bet','hit','stay','split','double','stay')
 
     def __init__(self,**kwargs):
@@ -13,7 +15,12 @@ class GameAction():
 
     def __setattr__(self,k,v):
         if k in self.__class__._fields:
-            super().__setattr__(k,v)
+            try:
+                if v in eval('GameAction._{}'.format(k)):
+                    super().__setattr__(k,v)
+            except Exception as e:
+                logger.error('GameAction.__setattr__: {} - {}'.format(e,k))
+                super().__setattr__(k,v)
 
     def process_action(self):
         if self.action == 'start':

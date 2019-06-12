@@ -1,6 +1,7 @@
 from .card_deck import PlayingCardDeck
 from .player import BlackJackPlayer, BlackJackDealer
 from .exceptions import GameException
+from .game_action import GameAction
 import logging
 
 logger = logging.getLogger('blog.blackjack.game_api')
@@ -15,6 +16,32 @@ class BlackJackGame():
         self.pool = 0
         self.bets = {}
 
+    ################################
+    ## Methods for getting values ##
+    ################################
+
+    def get_players(self):
+        return self.players
+
+    def get_deck(self):
+        return self.deck
+
+    def get_bet(self,player):
+        try:
+            return self.bets['{}'.format(player)]
+        except Exception as e:
+            logger.error('get_bet_error: {}'.format(e))
+
+    def get_bets(self):
+        return self.bets
+
+    def get_bets(self):
+        return self.bets
+
+    ################################
+    ## Methods for getting values ##
+    ################################
+
     def add_player(self,player):
         self.players[player.get_name()] = player
 
@@ -22,17 +49,21 @@ class BlackJackGame():
         for player in args:
             self.add_player(player)
 
-    def get_players(self):
-        return self.players
-
     def add_deck(self,deck):
         self.shoe.extend(deck)
 
-    def get_deck(self):
-        return self.deck
+    def add_bet(self,player,bet):
+        self.bets['{}'.format(player)] = bet
 
-    def get_bets(self):
-        raise NotImplementedError()
+    def add_bets(self,**kwargs):
+        for p,b in kwargs.items():
+            self.add_bet(player,bet)
+
+
+
+    ################
+    ## Game Logic ##
+    ################
 
     def deal_card_player(self,player,card):
         self.get_players()[player].give_card(card)
@@ -55,7 +86,40 @@ class BlackJackGame():
             # The user interface will need to be laid out a bit more before this can be built out
             pass
 
-    # This is responsible for running the game
+
+
+    ###################
+    ## Phase Routing ##
+    ###################
+
+    def create_player(self,action):
+        logger.debug('Enter: create_player')
+
+        self.add_player(BlackJackPlayer(action.player,action.chips))
+
+    def place_bet(self,action):
+        logger.debug('Enter: place_bet')
+
+        self.add_bet(action.player,action.bet)
+
+    _phase_router = {
+        'create_player': create_player,
+        'place_bet': place_bet,
+    }
+
+
+
+    #######################
+    ## Action Processing ##
+    #######################
+
+    # Use this to comunicate with the API
+    def process_action(self,action):
+        logger.debug('ACTION: {}'.format(action.__dict__))
+
+        return BlackJackGame._phase_router[action.phase](self,action)
+
+    # This is a generic outline
     def main(self):
 
         # Initialize the gamephase = game.phase_id
@@ -77,19 +141,3 @@ class BlackJackGame():
 
         # Check for next move
         self.next_round()
-
-    def start_game(self,game):
-        logger.debug('Enter: start_game')
-
-        self.game.add_player(BlackJackPlayer(game.player,game.chips))
-
-
-    # Use this to comunicate with the API
-    def process_action(self,game):
-        logger.debug('ACTION: {}'.format(game))
-
-        phase = game.phase
-        if phase == 'start':
-            self.start_game(game)
-        elif phase == 'betting':
-            logger.debug('Betting')

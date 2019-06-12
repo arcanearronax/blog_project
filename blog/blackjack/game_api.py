@@ -29,33 +29,29 @@ class GameViewSet(View):
     # Process form and update info in game
     def post(self,request):
         logger.info('Enter: GameViewSet-POST')
-        logger.debug('game_id={}'.format(request.POST.get('game_id')))
-        logger.debug('player={}'.format(request.POST.get('player')))
-        logger.debug('selection={}'.format(request.POST.get('selection')))
-        logger.debug('bet_amount={}'.format(request.POST.get('bet_amount')))
 
         form = BlackJackForm(request.POST)
+        action = GameAction()
         if form.is_valid():
             logger.debug('Form is valid')
 
             # Pull in our attributes
-            action = {}
-            action['game_id'] = request.POST.get('game_id')
-            action['player'] = request.POST.get('player')
-            action['selection'] = request.POST.get('selection')
-            action['bet_amount'] = request.POST.get('bet_amount')
-            action['phase'] = request.POST.get('phase')
+            action.game_id = request.POST.get('game_id')
+            action.player = request.POST.get('player')
+            action.selection = request.POST.get('selection')
+            action.bet_amount = request.POST.get('bet_amount')
+            action.phase = request.POST.get('phase')
 
             # Process game action
             self.game.process_action(action)
 
         else:
             logger.debug('Form is invalid')
-            action = {'error': 'Form is invalid'}
+            action.error = 'Form is invalid'
 
         context = {
             'gameform': GameViewSet.form,
-            'game_action': GameAction(request.POST.get('game_id'),request.POST.get('player'),request.POST.get('selection'),request.POST.get('bet_amount'),request.POST.get('game_phase')),
+            'game_action': action,
         }
 
         return HttpResponse(GameViewSet.template.render(context,request))
