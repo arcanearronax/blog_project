@@ -35,15 +35,13 @@ class BlackJackGame():
     def get_bets(self):
         return self.bets
 
-    def get_bets(self):
-        return self.bets
+    ###############################
+    ## Methods for adding values ##
+    ###############################
 
-    ################################
-    ## Methods for getting values ##
-    ################################
-
-    def add_player(self,player):
-        self.players[player.get_name()] = player
+    def add_player(self,player_name,chips):
+        ply = BlackJackPlayer(player_name,chips)
+        self.players[player_name] = ply
 
     def add_players(self,*args):
         for player in args:
@@ -52,14 +50,21 @@ class BlackJackGame():
     def add_deck(self,deck):
         self.shoe.extend(deck)
 
-    def add_bet(self,player,bet):
-        self.bets['{}'.format(player)] = bet
+    def add_bet(self,player_name,bet):
+        bet = int(bet)
+        ply_count = self.players[player_name].get_chip_count()
+        logger.debug('BET: {} - {}'.format(ply_count,bet))
+        assert ply_count >= bet, 'Bet exceeds chip count'
+        self.bets[player_name] = bet
 
     def add_bets(self,**kwargs):
         for p,b in kwargs.items():
             self.add_bet(player,bet)
 
-
+    def add_card(self,player_name):
+        card = self.deck.draw()
+        self.players[player_name].give_card(card)
+        logger.debug('Added: {}'.format(card))
 
     ################
     ## Game Logic ##
@@ -95,16 +100,22 @@ class BlackJackGame():
     def create_player(self,action):
         logger.debug('Enter: create_player')
 
-        self.add_player(BlackJackPlayer(action.player,action.chips))
+        self.add_player(action.player,action.chips)
 
     def place_bet(self,action):
         logger.debug('Enter: place_bet')
 
-        self.add_bet(action.player,action.bet)
+        self.add_bet(action.player,action.chips)
+
+    def deal_hand(self,action):
+        logger.debug('Enter: deal_cards')
+        self.add_card(action.player)
+        self.add_card(action.player)
 
     _phase_router = {
         'create_player': create_player,
         'place_bet': place_bet,
+        'deal_hand': deal_hand,
     }
 
 
@@ -117,7 +128,9 @@ class BlackJackGame():
     def process_action(self,action):
         logger.debug('ACTION: {}'.format(action.__dict__))
 
-        return BlackJackGame._phase_router[action.phase](self,action)
+        BlackJackGame._phase_router[action.phase](self,action)
+
+        return action
 
     # This is a generic outline
     def main(self):

@@ -41,13 +41,24 @@ class GameViewSet(View):
             action.selection = request.POST.get('selection')
             action.bet_amount = request.POST.get('bet_amount')
             action.phase = request.POST.get('phase')
+            action.chips = request.POST.get('chips')
 
             # Process game action
-            self.game.process_action(action)
+            action = self.game.process_action(action)
+
+            logger.debug('action')
+            if action.phase == 'create_player':
+                logger.debug('--player: {}'.format(action.player))
+                action.notes = 'created player: {}'.format(action.player)
+            elif action.phase == 'place_bet':
+                logger.debug('--bet: {}'.format(action.chips))
+                action.notes = 'bet placed: {}'.format(action.chips)
+            logger.debug(action.__dict__)
 
         else:
             logger.debug('Form is invalid')
             action.error = 'Form is invalid'
+            action.notes = 'Form is invalid'
 
         context = {
             'gameform': GameViewSet.form,

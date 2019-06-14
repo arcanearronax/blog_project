@@ -42,7 +42,7 @@ class BlackJackPlayer(AbstractPlayer):
         super().__init__(name)
 
     def get_chip_count(self):
-        return self.chips
+        return int(self.chips)
 
     def take_chips(self,chips):
         chip_count = self.get_chip_count()

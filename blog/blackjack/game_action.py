@@ -5,7 +5,7 @@ logger = logging.getLogger(__name__)
 # Used for game_api and game_master to communicate
 class GameAction():
 
-    _fields = ('game_id','phase','player','selection','chips','error')
+    _fields = ('game_id','phase','player','selection','chips','error','notes')
     _phase = ('create_player','place_bet','deal_hand')
     _actions = ('start','bet','hit','stay','split','double','stay')
 
@@ -19,7 +19,7 @@ class GameAction():
                 if v in eval('GameAction._{}'.format(k)):
                     super().__setattr__(k,v)
             except Exception as e:
-                logger.error('GameAction.__setattr__: {} - {}'.format(e,k))
+                logger.debug('No _field for: {} - {}'.format(e,k))
                 super().__setattr__(k,v)
 
     def process_action(self):
