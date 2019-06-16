@@ -53,6 +53,9 @@ class GameViewSet(View):
             elif action.phase == 'place_bet':
                 logger.debug('--bet: {}'.format(action.chips))
                 action.notes = 'bet placed: {}'.format(action.chips)
+            elif action.phase == 'deal_cards':
+                logger.debug('--cards: {}'.format('test'))
+                action.notes = 'cards dealt'
             logger.debug(action.__dict__)
 
         else:

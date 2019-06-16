@@ -5,9 +5,9 @@ logger = logging.getLogger(__name__)
 # Used for game_api and game_master to communicate
 class GameAction():
 
-    _fields = ('game_id','phase','player','selection','chips','error','notes')
-    _phase = ('create_player','place_bet','deal_hand')
-    _actions = ('start','bet','hit','stay','split','double','stay')
+    _fields = ('game_id','phase','player','move','chips','error','notes')
+    _phase = ('create_player','place_bet','deal_cards', 'player_move')
+    _move = ('hit','stay','split','double')
 
     def __init__(self,**kwargs):
         for k,v in kwargs.items():

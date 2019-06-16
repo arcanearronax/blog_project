@@ -1,7 +1,7 @@
 class CardException(Exception):
     pass
 
-class CardDeckException(Exception):
+class DeckException(Exception):
     pass
 
 class HandException(Exception):
