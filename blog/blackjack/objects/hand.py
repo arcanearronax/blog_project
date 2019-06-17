@@ -8,9 +8,17 @@ class AbstractHand(list):
     def __init__(self):
         super().__init__()
 
-    def add_card(self,card):
-        assert self.get_card_count() < self._card_limit, 'Hand is at limit'
-        self._cards.append(card)
+    def __str__(self):
+        tmp = ''
+        for card in self:
+            tmp += '{},'.format(str(card))
+        return '({})'.format(tmp)
+
+    def __repr__(self):
+        tmp = ''
+        for card in self:
+            tmp += '{},'.format(repr(card))
+        return '({})'.format(tmp)
 
     def get_card(self,ind=0):
         try:
@@ -22,7 +30,7 @@ class AbstractHand(list):
         return self[:]
 
     def give_card(self,card):
-        assert self.get_card_count() <= self.__class__._card_limit, 'Hand is at limit'
+        assert self.get_card_count() < self.__class__._card_limit, 'Hand is at limit'
         self.append(card)
 
     def give_cards(self,*args,**kwargs):

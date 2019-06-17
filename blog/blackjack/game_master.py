@@ -11,10 +11,6 @@ class GameMaster():
     _game_class = BlackJackGame
     games = dict()
 
-    ###################
-    ## Phase Routing ##
-    ###################
-
     # Simply add a new game object to the games dict
     @classmethod
     def create_game(cls,action):
@@ -29,30 +25,31 @@ class GameMaster():
 
     @classmethod
     def create_player(cls,action):
+        game = cls.games[action.game_id]
+        game.add_player(action.player_name,action.chips)
+
+    @classmethod
+    def start_round(cls,action):
+        game = cls.games[action.game_id]
+        player_name = action.player_name
+        game.add_bet(player_name,action.chips)
+        game.deal_initial_hand()
+        action.hands = game.get_player(player_name).get_hands()
+
+    @classmethod
+    def player_move(cls,action):
+        game = cls.games[action.game_id]
+        player_name = action.player_name
         try:
-            player = cls._game_class._player_class(action.player,action.chips)
-            cls.games[action.game_id].add_player(player)
-        except Exception as e:
-            logger.error('Some error: {}'.format(e))
-
-    @classmethod
-    def place_bet(cls,action):
-        logger.debug('Enter: place_bet')
-        self.add_bet(action.player,action.chips)
-
-    @classmethod
-    def deal_cards(cls,action):
-        logger.debug('Enter: deal_cards')
-        cls.games[action.game_id].add_card(action.player)
-        cls.games[action.game_id].dealer.add_card(hidden=True)
-        cls.games[action.game_id].add_card(action.player)
-        cls.games[action.game_id].dealer.add_card()
+            game.process_move(player_name,action.move)
+        except GameException as e:
+            action.error = e
+            action.notes = 'Move not allowed?'
 
     _phase_router = {
         'create_game': create_game,
         'create_player': create_player,
-        'place_bet': place_bet,
-        'deal_cards': deal_cards,
+        'start_round': start_round,
         #'player_move': player_move,
     }
 

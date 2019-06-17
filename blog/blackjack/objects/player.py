@@ -1,10 +1,10 @@
 from .hand import PlayingCardHand
-from ..exceptions import PlayerException
+from ..exceptions import PlayerException,HandException
 
 class AbstractPlayer():
     _hand_class = None
 
-    def __init__(self,name,*args,**kwargs):
+    def __init__(self,name):
         name_cls = name.__class__.__name__
         if name_cls != 'str':
             raise PlayerException('Player name must be a string: {}'.format(name_cls))
@@ -16,32 +16,29 @@ class AbstractPlayer():
     def __repr__(self):
         return str(self.__dict__)
 
-    def get_name(self):
-        return self.name
-
-    def get_hand(self):
-        return self.hand
-
-    def give_card(self,card):
-        self.hand.add_card(card)
-
-    def take_cards(self):
-        self.hand.take_cards()
-
-    def do_action(self,action):
-        print('DOING: {}'.format(action))
-
 class BlackJackPlayer(AbstractPlayer):
-    _hands_limit = 2
+    _hand_limit = 2
     _hand_class = PlayingCardHand
+    _moves = ('stay','hit','double','split')
 
     def __init__(self,name,chips):
+        chips = self.__class__.validate_chips(chips)
         self.chips = chips
         self.hands = [self.__class__._hand_class()]
+        self.moves = ()
         super().__init__(name)
 
     def __str__(self):
-        return '({},{},{})'.format(self.name,self.chips,self.hands)
+        hands = []
+        for hand in self.hands:
+            hands.append(str(hand))
+        return '({},{},{})'.format(self.name,self.chips,hands)
+
+    def disable_move(self,move):
+        self.moves = tuple(m for m in self.moves if m != move)
+
+    def enable_move(self,move):
+        self.moves += (move,)
 
     ##################
     ## Chip Methods ##
@@ -50,15 +47,22 @@ class BlackJackPlayer(AbstractPlayer):
     def get_chips(self):
         return int(self.chips)
 
+    def validate_chips(chips):
+        try:
+            return int(chips)
+        except TypeError:
+            raise PlayerException('Chips must be cast as int: {}'.format(chips.__class__.__name__))
+        except ValueError:
+            raise PlayerException('Chips must be cast as int: {}'.format(chips))
+
     def give_chips(self,chips):
-        chips_cls = chips.__class__.__name__
-        assert chips_cls == 'int', 'Chips must be int: {}'.format(chips_cls)
+        chips = self.__class__.validate_chips(chips)
         self.chips += chips
 
     def take_chips(self,chips):
         chip_count = self.get_chips()
-        chips_cls = chips.__class__.__name__
-        assert chips_cls == 'int', 'Chips must be int: {}'.format(chips_cls)
+        chips = self.__class__.validate_chips(chips)
+        print('CHIP CLASS: {}'.format(chips.__class__))
         if chips > chip_count:
             raise PlayerException('Chip request exceed amount: {}'.format(chip_count))
         else:
@@ -75,12 +79,17 @@ class BlackJackPlayer(AbstractPlayer):
             raise PlayerException('Card does not exist in hand: {}-{}'.format(hand,card))
 
     def get_cards(self,hand=0):
-        return self.hands[hand].get_cards()
+        try:
+            return self.hands[hand].get_cards()
+        except IndexError:
+            raise PlayerException('Hand does not exist: {}'.format(hand))
 
     def give_card(self,card,hand=0):
         try:
             self.hands[hand].give_card(card)
-        except AssertionError as a:
+        except IndexError:
+            raise PlayerException('Hand does not exist: {}'.format(hand))
+        except AssertionError:
             raise PlayerException('Hand is at limit: {}'.format(self.hands[hand].get_card_count()))
 
     def give_cards(self,*args,hand=0,**kwargs):
@@ -91,21 +100,35 @@ class BlackJackPlayer(AbstractPlayer):
         try:
             return self.hands[hand].take_card(card)
         except HandException as h:
-            raise PlayerException(h)
+            raise PlayerException('Card index is invalid: {}'.format(hand))
+        except IndexError:
+            raise PlayerException('Hand index does not exist: {}'.format(hand))
 
     def take_cards(self,hand=-1):
-        if hand == -1:
-            cards = []
-            for hand in self.hands:
-                cards += hands
-            self.hands = [self.__class__._hand_class()]
-            return cards
-        return self.hands[hand].take_cards()
+        try:
+            return self.hands[hand].take_cards()
+        except IndexError:
+            raise PlayerException('Hand index does not exist: {}'.format(hand))
+
+    def take_all_cards(self):
+        cards = []
+        for hand in self.hands:
+            cards += hand
+        self.hands = [self.__class__._hand_class()]
+        return cards
 
     ##################
     ## Hand Methods ##
     ##################
 
+    def get_hand(self,hand=0):
+        try:
+            return self.hands[hand]
+        except IndexError:
+            raise PlayerException('Hand does not exist: {}'.format(hand))
+
+    def get_hands(self):
+        return self.hands
 
 class BlackJackDealer(BlackJackPlayer):
 

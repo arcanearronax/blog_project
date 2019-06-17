@@ -14,6 +14,7 @@ class BlackJackGame():
         self.bets = {}
         self.dealer = BlackJackDealer()
         self.deck = PlayingCardDeck(num_decks)
+        self.phase = 'init'
 
     ################################
     ## Methods for getting values ##
@@ -49,26 +50,42 @@ class BlackJackGame():
     ## Methods for adding values ##
     ###############################
 
-    def add_player(self,player,chips):
+    def add_player(self,player_name,chips):
         player = BlackJackPlayer(player_name,chips)
-        self.players[player_name] = ply
+        self.players[player_name] = player
 
-    def add_deck(self,deck):
-        self.deck.extend(deck)
+    def add_players(self,*args,**kwargs):
+        for player_name,chips in kwargs.items():
+            self.add_player()
 
     def add_bet(self,player_name,bet):
         try:
             bet = int(bet)
         except TypeError:
-            raise GameException('Bet must be an int')
+            raise GameException('Bet must be an int: {}'.format(bet.__class__.__name__))
 
-        chip_count = self.players[player_name].get_chips()
-        assert ply_count >= bet, 'Insufficient chips for bet: {}'.format(bet)
+        chip_count = self.get_player(player_name).get_chips()
+        assert chip_count >= bet, 'Insufficient chips for bet: {} - {}'.format(player_name,bet)
         self.bets[player_name] = bet
 
     def add_bets(self,**kwargs):
         for player_name,bet in kwargs.items():
             self.add_bet(player_name,bet)
+
+    #################################
+    ## Methods for clearing values ##
+    #################################
+
+    def collect_bet(self,player):
+        player.take_chips(self.bet[player.name])
+
+    def collect_bets(self):
+        for player in self.players:
+            self.collect_bet(player)
+
+    def collect_cards(self):
+        for player in self.players:
+            player.take_all_cards()
 
     ################
     ## Game Logic ##
@@ -80,7 +97,12 @@ class BlackJackGame():
                 player.give_card(self.deck.draw())
             self.dealer.add_card(hidden=True) if cnt == 2 else self.dealer.add_card(hidden=False)
 
-    def player_hit(self,action):
+    # Pick up working here
+    def determine_available_moves(self,player_name):
+        pass
+
+    def player_hit(self,):
+        assert
         self.add_card(action.player)
         if self.players[action.player].hand.get_total() > 21:
             raise HandException('Hand score exceeds 21')
@@ -96,6 +118,16 @@ class BlackJackGame():
 
     def player_double(self,action):
         raise NotImplementedError()
+
+    def process_move(self,player_name,move):
+        player = self.get_player(player_name)
+        assert move in player._moves, 'Invalid Move Selection'
+
+
+
+    ###################
+    ## SomethingElse ##
+    ###################
 
     ###################
     ## Phase Routing ##
