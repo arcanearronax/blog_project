@@ -19,7 +19,7 @@ from django.conf import settings
 from django.conf.urls import include
 from django.conf.urls.static import static
 from rest_framework.authtoken import views as authviews
-from .blackjack.game_api import GameViewSet
+from .blackjack.game_view import GameViewSet
 
 from . import views, rest, login
 

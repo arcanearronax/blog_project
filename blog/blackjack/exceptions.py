@@ -12,3 +12,9 @@ class PlayerException(Exception):
 
 class GameException(Exception):
     pass
+
+class ActionException(Exception):
+    pass
+
+class MasterException(Exception):
+    pass

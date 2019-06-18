@@ -4,17 +4,18 @@ from .exceptions import GameException
 from .game_action import GameAction
 import logging
 
-logger = logging.getLogger('blog.blackjack.game_api')
+logger = logging.getLogger('blog.blackjack.game_view')
 
 class BlackJackGame():
     _player_class = BlackJackPlayer
 
-    def __init__(self,id,num_decks=1):
+    def __init__(self,num_decks=1):
         self.players = {}
         self.bets = {}
         self.dealer = BlackJackDealer()
-        self.deck = PlayingCardDeck(num_decks)
+        self.deck = PlayingCardDeck(num_decks,shuffle=True)
         self.phase = 'init'
+        self.player_done = False
 
     ################################
     ## Methods for getting values ##
@@ -52,6 +53,7 @@ class BlackJackGame():
 
     def add_player(self,player_name,chips):
         player = BlackJackPlayer(player_name,chips)
+        logger.debug('player_debug---{}'.format(player.__class__))
         self.players[player_name] = player
 
     def add_players(self,*args,**kwargs):
@@ -92,36 +94,60 @@ class BlackJackGame():
     ################
 
     def deal_initial_hand(self):
+        logger.debug('Enter: deal_initial_hand')
         for cnt in range(2):
-            for player in self.players:
+            for player_name,player in self.players.items():
+                logger.debug('PLAYER - {}'.format(player.__class__))
                 player.give_card(self.deck.draw())
-            self.dealer.add_card(hidden=True) if cnt == 2 else self.dealer.add_card(hidden=False)
+            self.dealer.give_card(self.deck.draw()) if cnt == 2 else self.dealer.give_card(self.deck.draw())
 
-    # Pick up working here
-    def determine_available_moves(self,player_name):
-        pass
+    # Determine moves the player can make
+    # This needs some work
+    def set_available_moves(self,player_name):
+        logger.debug('Enter: set_available_moves')
+        player = self.players[player_name]
+        tup = ('stay',)
+        if player.get_score() < 21 and player.get_card_count() < 5:
+            tup = tup + ('hit',)
+        elif player.get_card_count() == 2:
+            tup = tup + ('double',)
+            if player.get_card().face == player.get_card(card=1).face:
+                tup = tup + ('split',)
 
-    def player_hit(self,):
-        assert
-        self.add_card(action.player)
-        if self.players[action.player].hand.get_total() > 21:
-            raise HandException('Hand score exceeds 21')
+        logger.debug('moves: {}'.format(tup))
+        player.moves = tup
 
-    def player_stay(self,action):
-        return True
+    def player_hit(self,player_name):
+        logger.debug('HIT: {}'.format(player_name))
+        self.players[player_name].give_card(self.deck.draw())
+        if self.players[player_name].get_score() > 21:
+            raise GameException('Hand score exceeds 21')
 
-    def player_split(self,action):
-        self.players[action.player].split_hand()
-        self.add_card(action.player)
-        self.add_card_split(action.player)
+    def player_stay(self,player_name):
+        self.player_done = True
+
+    def player_split(self,player_name):
+        self.players[player_name].split_hand()
+        self.add_card(player_name)
+        self.add_card_split(player_name)
 
 
-    def player_double(self,action):
+    def player_double(self,player_name):
         raise NotImplementedError()
 
+    def dealer_move(self):
+        if self.dealer.get_score() < 16:
+            self.dealer.give_card(self.deck.draw())
+
     def process_move(self,player_name,move):
+        logger.debug('Enter: process_move - {} {}'.format(player_name, move))
         player = self.get_player(player_name)
         assert move in player._moves, 'Invalid Move Selection'
+
+        eval('self.player_{}(player_name)'.format(move))
+
+        if self.player_done:
+            self.dealer_move()
 
 
 
@@ -159,10 +185,10 @@ class BlackJackGame():
     def player_move(self,action):
         logger.debug('Enter: player_move')
         move = action.move
-        try:
-            if BlackJackGame._move_router[action.move](self,action):
-                pass
-            else:
-                raise GameException('Move is not allowed')
-        except HandAction as h:
-            self.player_loss(action)
+        BlackJackGame._move_router[move](self,action)
+
+
+    # Just using this as a quick way to test stuff
+    def get_cards(self,player_name):
+        player = self.players[player_name]
+        return player.get_cards()

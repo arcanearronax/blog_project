@@ -3,7 +3,7 @@ from ..exceptions import DeckException
 import random
 import logging
 
-logger = logging.getLogger('blog.blackjack.game_api')
+logger = logging.getLogger('blog.blackjack.game_view')
 
 class AbstractDeck(list):
     _card_class = None

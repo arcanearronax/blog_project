@@ -1,7 +1,7 @@
 from ..exceptions import CardException
 import logging
 
-logger = logging.getLogger('blog.blackjack.game_api')
+logger = logging.getLogger('blog.blackjack.game_view')
 
 class AbstractCard():
 

@@ -1,9 +1,10 @@
 from django.http import HttpResponse, JsonResponse
 from django.template import loader
 from django.views import View
-from .game_master import BlackJackGame
+from .game_master import GameMaster
 from .form import BlackJackForm
 from .game_action import GameAction
+from .exceptions import MasterException
 import logging
 
 logger = logging.getLogger(__name__)
@@ -13,12 +14,11 @@ class GameViewSet(View):
 
     template = loader.get_template('blackjack/index.html')
     form = BlackJackForm
-    game = BlackJackGame(1000)
+    game = GameMaster
 
     # Give page to user
     def get(self,request):
         logger.info('Enter: GameViewSet-GET')
-        logger.debug('TMP: {}'.format(request.__dict__['session']))
 
         template = GameViewSet.template
         context = {
@@ -30,33 +30,24 @@ class GameViewSet(View):
     def post(self,request):
         logger.info('Enter: GameViewSet-POST')
 
+        # Get our vars for processing
         form = BlackJackForm(request.POST)
         action = GameAction()
+
+        # Validate the form
         if form.is_valid():
             logger.debug('Form is valid')
 
-            # Pull in our attributes
-            action.game_id = request.POST.get('game_id')
-            action.player = request.POST.get('player')
-            action.selection = request.POST.get('selection')
-            action.bet_amount = request.POST.get('bet_amount')
-            action.phase = request.POST.get('phase')
-            action.chips = request.POST.get('chips')
+            # Get only the fields GameAction allows
+            for key in (key for key in request.POST if key in form.fields):
+                GameAction.__setattr__(action,key,request.POST.get(key))
 
-            # Process game action
-            action = self.game.process_action(action)
-
-            logger.debug('action')
-            if action.phase == 'create_player':
-                logger.debug('--player: {}'.format(action.player))
-                action.notes = 'created player: {}'.format(action.player)
-            elif action.phase == 'place_bet':
-                logger.debug('--bet: {}'.format(action.chips))
-                action.notes = 'bet placed: {}'.format(action.chips)
-            elif action.phase == 'deal_cards':
-                logger.debug('--cards: {}'.format('test'))
-                action.notes = 'cards dealt'
-            logger.debug(action.__dict__)
+            # Pass the action off to the game
+            try:
+                self.__class__.game.process_action(action)
+            except MasterException as m:
+                action.error = m
+                action.notes = m
 
         else:
             logger.debug('Form is invalid')
@@ -65,7 +56,7 @@ class GameViewSet(View):
 
         context = {
             'gameform': GameViewSet.form,
-            'game_action': action,
+            'action': action,
         }
 
         return HttpResponse(GameViewSet.template.render(context,request))

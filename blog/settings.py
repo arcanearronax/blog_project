@@ -196,7 +196,7 @@ LOGGING = {
             'level': 'DEBUG',
             'propogate': True,
         },
-        'blog.blackjack.game_api': {
+        'blog.blackjack.game_view': {
             'handlers': ['game-debug','game-info'],
             'level': 'DEBUG',
             'propogate': True,

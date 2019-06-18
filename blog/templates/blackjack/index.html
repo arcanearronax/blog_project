@@ -1,7 +1,41 @@
 {% load static %}
 <!DOCTYPE html>
+
+<html>
+
+  <meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+  <style>
+  .card {
+    background-image: url("graphics/cardback.gif");
+    border-color: #808080 #000000 #000000 #808080;
+    border-width: 1px;
+    border-style: solid;
+    color: #000000;
+    font-size: 20pt;
+    float:left;
+    width:  3.75em;
+    height: 5.00em;
+    margin:50px 10px 50px 10px;
+  }
+    .front {
+      background-color: #ffffff;
+      color: #000000;
+      float: inherit;
+      position: inherit;
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+
   <body>
     <h1>Game Template</h1>
+
+    <div id="user-interface">
 
     <!-- This div contains the BlackJack form itself -->
     <div id="BlackJackFormDiv" style="display:inherit; float:left;">
@@ -20,29 +54,61 @@
       </form>
     </div>
 
-    <div id="GameResults" style="display:inherit; float:bottom;">
 
-      {% if game_action %}
+
+    <div id="GameResults" style="position:relative; left:200px;">
+
+      {% if action %}
         <table>
             <tr>
-              <td>{{ game_action.game_id }}</td>
+              <td>game_id:</td>
+              <td>{{ action.game_id }}</td>
             </tr>
             <tr>
-              <td>{{ game_action.player }}</td>
+              <td>player_name:</td>
+              <td>{{ action.player_name }}</td>
             </tr>
             <tr>
-              <td>{{ game_action.selection }}</td>
+              <td>move:</td>
+              <td>{{ action.move }}</td>
             </tr>
             <tr>
-              <td>{{ game_action.chips }}</td>
+              <td>phase:</td>
+              <td>{{ action.phase }}</td>
             </tr>
             <tr>
-              <td>{{ game_action.phase }}</td>
+              <td>chips:</td>
+              <td>{{ action.chips }}</td>
             </tr>
         </table>
 
-        <p>Notes: {{ game_action.notes }}</p>
+        {% if action.notes %}
+          <p>Notes: {{ action.notes }}</p>
+        {% endif %}
+
+        {% if action.error %}
+          <p>ERROR: {{ action.error }}</p>
+        {% endif %}
+
+      {% else %}
+
       {% endif %}
+
+    </div>
+
+    </div>
+
+    <div id="hand-div" style="clear:both;">
+
+      {% for card in action.hands %}
+
+        <div class="card">
+          <div class="front">{{ card }}</div>
+        </div>
+
+      {% empty %}
+        <p>No Cards</p>
+      {% endfor %}
 
     </div>
 

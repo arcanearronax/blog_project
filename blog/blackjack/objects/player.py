@@ -1,5 +1,8 @@
 from .hand import PlayingCardHand
 from ..exceptions import PlayerException,HandException
+import logging
+
+logger = logging.getLogger('blog.blackjack.game_view')
 
 class AbstractPlayer():
     _hand_class = None
@@ -129,6 +132,20 @@ class BlackJackPlayer(AbstractPlayer):
 
     def get_hands(self):
         return self.hands
+
+    ###################
+    ## Logic Methods ##
+    ###################
+
+    def get_score(self,hand=0):
+        score = self.hands[hand].get_value()
+        logger.debug('GetScore - {}'.format(score))
+        return score
+
+    def get_card_count(self,hand=0):
+        cnt = self.hands[hand].get_card_count()
+        logger.debug('GetCardCount - {}'.format(cnt))
+        return cnt
 
 class BlackJackDealer(BlackJackPlayer):
 

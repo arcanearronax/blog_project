@@ -1,6 +1,7 @@
+from .exceptions import ActionException
 import logging
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('blog.blackjack.game_view')
 
 # Used for game_api and game_master to communicate
 class GameAction():
@@ -13,15 +14,21 @@ class GameAction():
         for k,v in kwargs.items():
             self.__setattr__(k,v)
 
+    def __str__(self):
+        return str(self.__dict__)
+
     def __setattr__(self,k,v):
         if k in self.__class__._fields:
             try:
                 if v in eval('GameAction._{}'.format(k)):
                     super().__setattr__(k,v)
+                else:
+                    raise ActionException('Assignment not allowed: {} - {}'.format(k,v))
             except Exception as e:
-                logger.debug('No _field for: {} - {}'.format(e,k))
                 super().__setattr__(k,v)
 
-    def process_action(self):
-        if self.action == 'start':
-            pass
+    def add_note(self,note):
+        self.notes = note
+
+    def add_error(self,error):
+        self.error = error
