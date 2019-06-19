@@ -147,6 +147,14 @@ class BlackJackPlayer(AbstractPlayer):
         logger.debug('GetCardCount - {}'.format(cnt))
         return cnt
 
+    def can_move(self):
+        ret = False
+        if self.get_card_count() < self.__class__._hand_limit:
+            if self.get_score() < 21:
+                ret = True
+
+        return ret
+
 class BlackJackDealer(BlackJackPlayer):
 
     def __init__(self,chips=1000000):
