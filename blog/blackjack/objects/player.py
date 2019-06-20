@@ -47,6 +47,9 @@ class BlackJackPlayer(AbstractPlayer):
     ## Chip Methods ##
     ##################
 
+    def get_name(self):
+        return self.name
+
     def get_chips(self):
         return int(self.chips)
 
@@ -138,14 +141,10 @@ class BlackJackPlayer(AbstractPlayer):
     ###################
 
     def get_score(self,hand=0):
-        score = self.hands[hand].get_value()
-        logger.debug('GetScore - {}'.format(score))
-        return score
+        return self.hands[hand].get_value()
 
     def get_card_count(self,hand=0):
-        cnt = self.hands[hand].get_card_count()
-        logger.debug('GetCardCount - {}'.format(cnt))
-        return cnt
+        return self.hands[hand].get_card_count()
 
     def can_move(self):
         ret = False
@@ -154,6 +153,7 @@ class BlackJackPlayer(AbstractPlayer):
                 ret = True
 
         return ret
+
 
 class BlackJackDealer(BlackJackPlayer):
 

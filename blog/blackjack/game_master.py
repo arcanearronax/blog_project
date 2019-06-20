@@ -1,8 +1,6 @@
-from .objects.card_deck import PlayingCardDeck
-from .objects.player import BlackJackPlayer, BlackJackDealer
 from .game import BlackJackGame
-from .exceptions import GameException,MasterException
 from .game_action import GameAction
+from .exceptions import GameException,MasterException
 import logging
 
 logger = logging.getLogger('blog.blackjack.game_view')
@@ -49,17 +47,17 @@ class GameMaster():
         game_id = str(int(action.game_id))
         try:
             game = cls.games[game_id]
-            player_name = game.get_player(action.player_name)
+            player_name = game.get_player(action.player_name).get_name()
             game.add_bet(player_name,action.chips)
             game.deal_initial_hand()
         except Exception as e:
-            loggger.debug('start_round_error: {}'.format(e))
+            logger.debug('start_round_error: {}'.format(e))
             action.add_error(e)
         else:
             action.dealer_hand = game.get_dealer_cards()
             action.hands = game.get_cards(player_name)
 
-            success = '{} dealt: {}'.format(player_name)
+            success = '{} dealt: {}'.format(player_name,action.hands)
             logger.debug('start_round: {}'.format(success))
             action.add_note(success)
 
@@ -70,10 +68,10 @@ class GameMaster():
 
         try:
             game = cls.games[game_id]
-            player_name = game.get_player(action.player_name)
+            player_name = action.player_name
             game.process_move(player_name,action.move)
         except Exception as e:
-            loggger.debug('player_move_error: {}'.format(e))
+            logger.debug('player_move_error: {}'.format(e))
             action.error = e
             action.notes = e
 
@@ -84,7 +82,7 @@ class GameMaster():
             game.evaluate_winners()
             game.payout_bets()
 
-            logger.debug('ACTION-WINNERs: {}'.format(game.winners))
+            logger.debug('ACTION-WINNERS: {}'.format(game.winners))
             if game.winners[player_name]:
                 action.notes = 'Player won'
             else:
@@ -98,7 +96,6 @@ class GameMaster():
         'create_player': create_player,
         'start_round': start_round,
         'player_move': player_move,
-        #'dealer_move': dealer_move,
     }
 
     #######################

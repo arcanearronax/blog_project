@@ -54,10 +54,20 @@ class AbstractHand(list):
     def get_card_count(self):
         return len(self)
 
-
 class PlayingCardHand(AbstractHand):
     _card_class = PlayingCard
     _card_limit = 5
 
     def get_value(self):
         return sum(x.get_value() for x in self.get_cards())
+
+    def set_available_moves(self):
+        tup = ('stay',)
+        card_count = self.get_card_count()
+        if self.get_value() < 21 and card_count < self.__class__._card_limit:
+            tup = tup + ('hit',)
+            if card_count == 2:
+                tup = tup + ('double',)
+                if self[0].face == self[1].face:
+                    tup = tup + ('split',)
+        self.available_moves = tup

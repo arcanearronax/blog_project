@@ -28,7 +28,6 @@ class AbstractCard():
         super().__setattr__(attr,value)
 
     def flip(self):
-        logger.debug('FLIP CARD')
         self.hidden = not self.hidden
 
 class PlayingCard(AbstractCard):

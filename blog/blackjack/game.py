@@ -10,43 +10,38 @@ class BlackJackGame():
     _player_class = BlackJackPlayer
 
     def __init__(self,num_decks=1):
-        self.players = {}
-        self.bets = {}
         self.dealer = BlackJackDealer()
         self.deck = PlayingCardDeck(num_decks,shuffle=True)
-        self.phase = 'init'
-        self.player_done = False
-        self.winners = dict()
+        self.players = dict()
+        self.player_bets = {}
+        self.player_done = {}
+        self.winners = dict() #This has an appended value to indicate hand
 
-    ################################
-    ## Methods for getting values ##
-    ################################
+    #######################################
+    ## Methods for getting object values ##
+    #######################################
 
     def __repr__(self):
         return str(self.__dict__)
 
-    def get_player(self,player_name):
-        try:
-            return self.players[player_name]
-        except KeyError:
-            raise GameException('Player not found: {}'.format(player_name))
-
-    def get_players(self):
-        return self.players
+    def get_dealer(self):
+        return self.dealer
 
     def get_deck(self):
         return self.deck
 
+    def get_player(self,player_name):
+        return self.players[player_name]
+
+    # Return a list of player objects
+    def get_players(self):
+        return list(self.players.values())
+
     def get_bet(self,player_name):
-        try:
-            return self.bets['{}'.format(player_name)]
-        except KeyError:
-            raise GameException('Bet not found: {}'.format(player_name))
-        except Exception as e:
-            logger.error('get_bet_error: {}'.format(e))
+        return self.player_bets[player_name]
 
     def get_bets(self):
-        return self.bets
+        return self.player_bets
 
     def get_dealer_cards(self):
         return self.dealer.get_cards()
@@ -56,23 +51,18 @@ class BlackJackGame():
     ###############################
 
     def add_player(self,player_name,chips):
-        player = BlackJackPlayer(player_name,chips)
-        logger.debug('player_debug---{}'.format(player.__class__))
-        self.players[player_name] = player
+        logger.debug('Enter: add_player {}'.format(player_name))
+        self.players[player_name] = BlackJackPlayer(player_name,chips)
 
     def add_players(self,*args,**kwargs):
         for player_name,chips in kwargs.items():
-            self.add_player()
+            self.add_player(player_name,chips)
 
     def add_bet(self,player_name,bet):
-        try:
-            bet = int(bet)
-        except TypeError:
-            raise GameException('Bet must be an int: {}'.format(bet.__class__.__name__))
-
-        chip_count = self.get_player(player_name).get_chips()
-        assert chip_count >= bet, 'Insufficient chips for bet: {} - {}'.format(player_name,bet)
-        self.bets[player_name] = bet
+        logger.debug('Enter: add_bet: {} {}'.format(player_name,bet))
+        bet = int(bet)
+        assert self.get_player(player_name).get_chips() >= bet, 'Insufficient chips for bet: {} - {}'.format(player_name,bet)
+        self.player_bets[player_name] = bet
 
     def add_bets(self,**kwargs):
         for player_name,bet in kwargs.items():
@@ -83,14 +73,14 @@ class BlackJackGame():
     #################################
 
     def collect_bet(self,player):
-        player.take_chips(self.bet[player.name])
+        player.take_chips(self.get_bet(player.get_name()))
 
     def collect_bets(self):
-        for player in self.players:
+        for player in self.get_players():
             self.collect_bet(player)
 
     def collect_cards(self):
-        for player in self.players:
+        for player in self.get_players():
             player.take_all_cards()
 
     ################
@@ -99,9 +89,8 @@ class BlackJackGame():
 
     # Determine moves the player can make
     # This needs some work
-    def set_available_moves(self,player_name):
+    def set_available_moves(self,player):
         logger.debug('Enter: set_available_moves')
-        player = self.players[player_name]
         tup = ('stay',)
         if player.get_score() < 21 and player.get_card_count() < 5:
             tup = tup + ('hit',)
@@ -113,76 +102,87 @@ class BlackJackGame():
         logger.debug('moves: {}'.format(tup))
         player.moves = tup
 
-    def deal_initial_hand(self):
-        logger.debug('Enter: deal_initial_hand')
-        for cnt in range(2):
-            for player_name,player in self.players.items():
-                logger.debug('PLAYER - {}'.format(player.__class__))
-                player.give_card(self.deck.draw())
-            if cnt == 1:
-                self.dealer.give_card(self.deck.draw())
-            else:
-                self.dealer.give_card(self.deck.draw(hidden=True))
+    def payout_bet(self,player_name):
+        base_name = player_name[:-1]
+        if self.winners[player_name]:
+            self.get_player(base_name).give_chips(self.get_bet(base_name))
+        else:
+            self.get_player(base_name).take_chips(self.get_bet(base_name))
 
-        logger.debug('DEALER: {}'.format(self.dealer.get_cards()))
+    def payout_bets(self):
+        for player_name in self.winners:
+            self.payout_bet(player_name)
+        self.player_bets = dict()
 
-        for player_name,player in self.players.items():
-            self.set_available_moves(player_name)
-
-    def player_hit(self,player_name):
-        logger.debug('HIT: {}'.format(player_name))
-        self.players[player_name].give_card(self.deck.draw())
-        if self.players[player_name].get_score() > 21:
-            raise GameException('Hand score exceeds 21')
-
-    def player_stay(self,player_name):
-        self.dealer_move()
-        self.dealer.get_card().flip()
-
-    def player_split(self,player_name):
-        self.players[player_name].split_hand()
-        self.add_card(player_name)
-        self.add_card_split(player_name)
-
-    def player_double(self,player_name):
-        raise NotImplementedError()
-
-    def dealer_move(self):
-        if self.dealer.get_score() < 16:
-            self.dealer.give_card(self.deck.draw())
-
-    def evaluate_winner(self,hand=0):
-        player_score = player.get_score(hand=hand)
-        dealer_score = dealer.get_score()
+    def evaluate_winner(self,hand):
+        hand_score = hand.get_value()
+        dealer_score = self.dealer.get_score()
 
         # Check for busts
-        if player_score > 21:
+        if hand_score > 21:
             return False
         elif dealer_score > 21:
             return True
 
-        if player_score > dealer_score:
+        if hand_score > dealer_score:
             return True
 
         return False
 
     def evaluate_winners(self):
-        for player_name,player in self.get_players().items():
+        for player in self.get_players():
             for ind,hand in enumerate(player.get_hands()):
-                self.winners['{}{}'.format(player.name,ind)] = self.evaluate_winner(player.name,hand=ind)
+                self.winners['{}{}'.format(player.get_name(),ind)] = self.evaluate_winner(hand)
 
-    def payout_bet(self,player_name):
-        base_name = player_name[:-1]
-        if self.winners[player_name]:
-            self.players[base_name].give_chips(self.get_bet(base_name))
-        else:
-            self.players[base_name].take_chips(self.get_bet(base_name))
+    ##################
+    ## Game Methods ##
+    ##################
 
-    def payout_bets(self):
-        for player_name in self.winners:
-            self.payout_bet(player_name)
-        self.bets = dict()
+    # This is called when hands are dealt
+    def deal_initial_hand(self):
+        logger.debug('Enter: deal_initial_hand')
+        for cnt in range(2):
+            for player in self.get_players():
+                player.give_card(self.deck.draw())
+            if cnt == 1:
+                self.get_dealer().give_card(self.deck.draw())
+            else:
+                self.get_dealer().give_card(self.deck.draw(hidden=True))
 
+        logger.debug('DEALER: {}'.format(self.get_dealer().get_cards()))
+
+        for player in self.get_players():
+            for hand in player.get_hands():
+                hand.set_available_moves()
+
+    # This is called when the player hits
+    def player_hit(self,player_name):
+        logger.debug('HIT: {}'.format(player_name))
+        self.get_player(player_name).give_card(self.deck.draw())
+        if self.get_player(player_name).get_score() > 21:
+            raise GameException('Hand score exceeds 21')
+
+    # This is called when the player is done making moves
+    def player_stay(self,player_name):
+        self.dealer_move()
+        self.get_dealer().get_card().flip()
+
+    # This is called when the player splits their hand
+    def player_split(self,player_name):
+        self.get_player(player_name).split_hand()
+        self.add_card(player_name)
+        self.add_card_split(player_name)
+
+    # This is called when the player doubles
+    def player_double(self,player_name):
+        raise NotImplementedError()
+
+    # This is called when players have finished or can't move
+    def dealer_move(self):
+        while self.get_dealer().get_score() < 16:
+            self.get_dealer().give_card(self.deck.draw())
+
+    # This is called when the player makes a move
     def process_move(self,player_name,move):
         logger.debug('Enter: process_move - {} {}'.format(player_name, move))
         player = self.get_player(player_name)
@@ -190,27 +190,23 @@ class BlackJackGame():
 
         eval('self.player_{}(player_name)'.format(move))
 
-        if self.player_done:
+        # Have the players finished their moves?
+        dealer_can_move = True
+        for name,is_done in self.player_done.items():
+            if not is_done:
+                dealer_can_move = False
+                break
+
+        if dealer_can_move:
             self.dealer_move()
 
-    ###################
-    ## Phase Routing ##
-    ###################
 
-    _move_router = {
-        'hit': player_hit,
-        'stay': player_stay,
-        'split': player_split,
-        'double': player_double,
-    }
 
-    # This may get called a few times, need to process logic based on hand
-    def player_move(self,action):
-        logger.debug('Enter: player_move')
-        move = action.move
-        BlackJackGame._move_router[move](self,action)
+
+
+
 
     # Just using this as a quick way to test stuff
     def get_cards(self,player_name):
-        player = self.players[player_name]
+        player = self.get_player(player_name)
         return player.get_cards()
