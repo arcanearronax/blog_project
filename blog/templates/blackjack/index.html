@@ -10,6 +10,32 @@
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
   <style>
+    #form-div {
+      display: inherit;
+      float: left;
+    }
+    #game-div {
+      overflow: hidden;
+      background-image: url("../static/game/hand_back.jpg");
+      background-size: 100%;
+      float: left;
+      margin: 0px 100px 0px 100px;
+    }
+    #player-hands-div {
+      float: inherit;
+    }
+    #dealer-hands-div {
+      float: inherit;
+      clear: both;
+    }
+    .hand {
+      border-color: #000000 #000000 #000000 #000000;
+      border-width: 2px;
+      border-style: solid;
+      margin: 20px 20px 20px 20px;
+      padding: 10px 40px 10px 40px;
+      float: left;
+    }
     .card {
       color: #000000;
       font-size: 20pt;
@@ -33,15 +59,11 @@
       width: 88px;
       height: 128px;
     }
-    .hand {
-      background-image: url("../static/game/hand_back.jpg");
-      background-size: 100%;
-      border-color: #000000 #000000 #000000 #000000;
-      border-width: 2px;
-      border-style: solid;
-      float: left;
-      margin: 20px 20px 20px 20px;
-      padding: 10px 40px 10px 40px;
+    #game-results {
+      float:left;
+      position:relative;
+      left:100px;
+      clear: both;
     }
   </style>
 
@@ -51,7 +73,7 @@
     <div id="user-interface">
 
       <!-- This div contains the BlackJack form itself -->
-      <div id="BlackJackFormDiv" style="display:inherit; float:left;">
+      <div id="form-div">
         <form method="POST" class="blackjack-form" id="BlackJackForm">
           {% csrf_token %}
           <table>
@@ -67,113 +89,111 @@
         </form>
       </div>
 
-
-
-      <div id="GameResults" style="float:left; position:relative; left:100px;">
-
-        {% if action %}
-          <table>
-              <tr>
-                <td>game_id:</td>
-                <td>{{ action.game_id }}</td>
-              </tr>
-              <tr>
-                <td>player_name:</td>
-                <td>{{ action.player_name }}</td>
-              </tr>
-              <tr>
-                <td>move:</td>
-                <td>{{ action.move }}</td>
-              </tr>
-              <tr>
-                <td>phase:</td>
-                <td>{{ action.phase }}</td>
-              </tr>
-              <tr>
-                <td>chips:</td>
-                <td>{{ action.chips }}</td>
-              </tr>
-          </table>
-
-          {% if action.notes %}
-            <p>Notes: {{ action.notes }}</p>
-          {% endif %}
-
-          {% if action.error %}
-            <p>ERROR: {{ action.error }}</p>
-          {% endif %}
-
-        {% else %}
-        {% endif %}
-      </div>
-    </div>
-
-    {% if action.hands %}
-      <div id="hands-div" style="clear:both;">
-
-        <div id="player-hands-div" class="hand">
-          {% if action.hands %}
-            <h3>Player Hand</h3>
-          {% endif %}
-
-          {% for card in action.hands %}
-
-          <div class="card">
-            <div class="front">
-              {{ card.face }}
-              {% if card.suit == 'Spades' %}
-                &#9824;
-              {% elif card.suit == 'Hearts' %}
-                &#9829;
-              {% elif card.suit == 'Clubs' %}
-                &#9827;
-              {% elif card.suit == 'Diamonds' %}
-                &#9830;
-              {% else %}
-                {{ card.suit }}
-              {% endif %}
-            </div>
-          </div>
-
-          {% empty %}
-          {% endfor %}
-        </div>
-      {% endif %}
-
       {% if action.hands %}
-        <div id="dealer-hands-div" class="hand">
-          {% if action.dealer_hand %}
-            <h3>Dealer Hand</h3>
-          {% endif %}
+        <div id="game-div">
 
-          {% for card in action.dealer_hand %}
+          <div id="player-hands-div" class="hand">
+            {% if action.hands %}
+              <h3>Player Hand</h3>
+            {% endif %}
+
+            {% for card in action.hands %}
 
             <div class="card">
-              {% if card.hidden %}
-                <div class="back"></div>
-              {% else %}
-                <div class="front">
-                  {{ card.face }}
-                  {% if card.suit == 'Spades' %}
-                    &#9824;
-                  {% elif card.suit == 'Hearts' %}
-                    &#9829;
-                  {% elif card.suit == 'Clubs' %}
-                    &#9827;
-                  {% elif card.suit == 'Diamonds' %}
-                    &#9830;
-                  {% else %}
-                    {{ card.suit }}
-                  {% endif %}
-                </div>
-              {% endif %}
+              <div class="front">
+                {{ card.face }}
+                {% if card.suit == 'Spades' %}
+                  &#9824;
+                {% elif card.suit == 'Hearts' %}
+                  &#9829;
+                {% elif card.suit == 'Clubs' %}
+                  &#9827;
+                {% elif card.suit == 'Diamonds' %}
+                  &#9830;
+                {% else %}
+                  {{ card.suit }}
+                {% endif %}
+              </div>
             </div>
 
-          {% empty %}
-          {% endfor %}
-        </div>
+            {% empty %}
+            {% endfor %}
+          </div>
       {% endif %}
 
+        {% if action.hands %}
+          <div id="dealer-hands-div" class="hand">
+            {% if action.dealer_hand %}
+              <h3>Dealer Hand</h3>
+            {% endif %}
+
+            {% for card in action.dealer_hand %}
+
+              <div class="card">
+                {% if card.hidden %}
+                  <div class="back"></div>
+                {% else %}
+                  <div class="front">
+                    {{ card.face }}
+                    {% if card.suit == 'Spades' %}
+                      &#9824;
+                    {% elif card.suit == 'Hearts' %}
+                      &#9829;
+                    {% elif card.suit == 'Clubs' %}
+                      &#9827;
+                    {% elif card.suit == 'Diamonds' %}
+                      &#9830;
+                    {% else %}
+                      {{ card.suit }}
+                    {% endif %}
+                  </div>
+                {% endif %}
+              </div>
+
+            {% empty %}
+            {% endfor %}
+          </div>
+
+        </div>
+      {% endif %}
+    </div>
+
+    <div id="game-results">
+
+      {% if action %}
+        <table>
+            <tr>
+              <td>game_id:</td>
+              <td>{{ action.game_id }}</td>
+            </tr>
+            <tr>
+              <td>player_name:</td>
+              <td>{{ action.player_name }}</td>
+            </tr>
+            <tr>
+              <td>move:</td>
+              <td>{{ action.move }}</td>
+            </tr>
+            <tr>
+              <td>phase:</td>
+              <td>{{ action.phase }}</td>
+            </tr>
+            <tr>
+              <td>chips:</td>
+              <td>{{ action.chips }}</td>
+            </tr>
+        </table>
+
+        {% if action.notes %}
+          <p>Notes: {{ action.notes }}</p>
+        {% endif %}
+
+        {% if action.error %}
+          <p>ERROR: {{ action.error }}</p>
+        {% endif %}
+
+      {% else %}
+      {% endif %}
     </div>
 
   </body>
