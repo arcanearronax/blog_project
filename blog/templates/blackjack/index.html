@@ -59,7 +59,7 @@
       width: 88px;
       height: 128px;
     }
-    #game-results {
+    #game-info {
       float:left;
       position:relative;
       left:100px;
@@ -89,9 +89,8 @@
         </form>
       </div>
 
-      {% if action.hands %}
-        <div id="game-div">
-
+      <div id="game-div">
+        {% if action.hands %}
           <div id="player-hands-div" class="hand">
             {% if action.hands %}
               <h3>Player Hand</h3>
@@ -99,27 +98,27 @@
 
             {% for card in action.hands %}
 
-            <div class="card">
-              <div class="front">
-                {{ card.face }}
-                {% if card.suit == 'Spades' %}
-                  &#9824;
-                {% elif card.suit == 'Hearts' %}
-                  &#9829;
-                {% elif card.suit == 'Clubs' %}
-                  &#9827;
-                {% elif card.suit == 'Diamonds' %}
-                  &#9830;
-                {% else %}
-                  {{ card.suit }}
-                {% endif %}
+              <div class="card">
+                <div class="front">
+                  {{ card.face }}
+                  {% if card.suit == 'Spades' %}
+                    &#9824;
+                  {% elif card.suit == 'Hearts' %}
+                    &#9829;
+                  {% elif card.suit == 'Clubs' %}
+                    &#9827;
+                  {% elif card.suit == 'Diamonds' %}
+                    &#9830;
+                  {% else %}
+                    {{ card.suit }}
+                  {% endif %}
+                </div>
               </div>
-            </div>
 
             {% empty %}
             {% endfor %}
           </div>
-      {% endif %}
+        {% endif %}
 
         {% if action.hands %}
           <div id="dealer-hands-div" class="hand">
@@ -149,16 +148,14 @@
                   </div>
                 {% endif %}
               </div>
-
             {% empty %}
             {% endfor %}
           </div>
-
-        </div>
-      {% endif %}
+        {% endif %}
+      </div>
     </div>
 
-    <div id="game-results">
+    <div id="game-info">
 
       {% if action %}
         <table>

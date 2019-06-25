@@ -75,21 +75,32 @@ class GameMaster():
             action.error = e
             action.notes = e
 
+        end_hand = False
 
-        if not game.get_player(player_name).can_move() and not action.move == 'stay':
+        if action.move == 'stay':
+            end_hand = True
+        elif not game.get_player(player_name).can_move():
+            end_hand = True
+
+
+        if end_hand:
             logger.debug('PLAYER NOT MOVING')
             game.dealer_move()
             game.evaluate_winners()
             game.payout_bets()
 
             logger.debug('ACTION-WINNERS: {}'.format(game.winners))
-            if game.winners[player_name]:
+            if game.is_simple_winner(player_name):
                 action.notes = 'Player won'
             else:
                 action.notes = 'Dealer won'
 
-        action.hands = game.get_cards(player_name)
-        action.dealer_hand = game.get_dealer_cards()
+            action.hands = game.get_cards(player_name)
+            action.dealer_hand = game.get_dealer_cards()
+            game.collect_cards()
+        else:
+            action.hands = game.get_cards(player_name)
+            action.dealer_hand = game.get_dealer_cards()
 
     _phase_router = {
         'create_game': create_game,

@@ -82,6 +82,7 @@ class BlackJackGame():
     def collect_cards(self):
         for player in self.get_players():
             player.take_all_cards()
+        self.dealer.take_all_cards()
 
     ################
     ## Game Logic ##
@@ -113,6 +114,15 @@ class BlackJackGame():
         for player_name in self.winners:
             self.payout_bet(player_name)
         self.player_bets = dict()
+
+    def is_simple_winner(self,player_name):
+        # Just a quick and dirty way to figure out if someone won
+        try:
+            ret = self.winners[player_name + '0']
+        except KeyError:
+            return False
+        else:
+            return ret
 
     def evaluate_winner(self,hand):
         hand_score = hand.get_value()
@@ -165,7 +175,6 @@ class BlackJackGame():
     # This is called when the player is done making moves
     def player_stay(self,player_name):
         self.dealer_move()
-        self.get_dealer().get_card().flip()
 
     # This is called when the player splits their hand
     def player_split(self,player_name):
@@ -181,6 +190,7 @@ class BlackJackGame():
     def dealer_move(self):
         while self.get_dealer().get_score() < 16:
             self.get_dealer().give_card(self.deck.draw())
+        self.dealer.hands[0][0].flip()
 
     # This is called when the player makes a move
     def process_move(self,player_name,move):
