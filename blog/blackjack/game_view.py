@@ -44,7 +44,8 @@ class GameViewSet(View):
 
             # Pass the action off to the game
             try:
-                self.__class__.game.process_action(action)
+                resp = self.__class__.game.process_action(action)
+                logger.debug('GAME RESPONSE: {}'.format(resp.__dict__))
             except MasterException as m:
                 action.error = m
                 action.notes = m
@@ -57,6 +58,7 @@ class GameViewSet(View):
         context = {
             'gameform': GameViewSet.form,
             'action': action,
+            'response': resp,
         }
 
         return HttpResponse(GameViewSet.template.render(context,request))

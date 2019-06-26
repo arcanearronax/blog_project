@@ -193,5 +193,20 @@
       {% endif %}
     </div>
 
+    <div id='game-response'>
+      {% if response %}
+        <h4>Game Response</h4>
+        <table>
+          {% for attr,value in response.attrs %}
+            <tr>
+              <td>{{ attr }}:</td>
+              <td>{{ value }}</td>
+            </tr>
+          {% empty %}
+          {% endfor %}
+        </table>
+      {% endif %}
+    </div>
+
   </body>
 </html>

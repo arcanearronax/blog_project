@@ -1,5 +1,6 @@
 from .game import BlackJackGame
 from .game_action import GameAction
+from .game_response import GameResponse
 from .exceptions import GameException,MasterException
 import logging
 
@@ -9,6 +10,44 @@ logger = logging.getLogger('blog.blackjack.game_view')
 class GameMaster():
     _game_class = BlackJackGame
     games = dict()
+
+    def get_response(game,action):
+        logger.debug('ENTER: get_response')
+
+        resp = GameResponse()
+        resp.game_id = action.game_id
+        try:
+            logger.debug('get_response - test1')
+            player_name = game.get_player(action.player_name).get_name()
+            resp.player_name = player_name
+            player = game.get_player(player_name)
+            resp.chip_count = player.get_chips()
+        except Exception:
+            return resp
+        else:
+            try:
+                logger.debug('get_response - test2')
+                resp.bet_amount = game.get_bet(player_name)
+                logger.debug('get_response - test2.1')
+                resp.player_score = player.get_score()
+                logger.debug('get_response - test2.2')
+            except Exception as e:
+                logger.debug('RESPONSE ERROR: {}'.format(e))
+                return resp
+
+            if game.game_done:
+                try:
+                    logger.debug('get_response - test3')
+                    resp.dealer_score = game.get_dealer().get_score()
+                except Exception:
+                    return resp
+                else:
+                    if game.is_simple_winner(player_name):
+                        resp.result = '{} wins'.format(player_name)
+                    else:
+                        resp.result = '{} loses'.format(player_name)
+                    resp.reason = '{} vs {}'.format(player.get_score(),game.dealer.get_score())
+            return resp
 
     # Simply add a new game object to the games dict
     @classmethod
@@ -24,7 +63,6 @@ class GameMaster():
             success = 'Created Game {}'.format(game_id)
             logger.debug('create_game: {}'.format(success))
             action.add_note(success)
-        return action
 
     @classmethod
     def create_player(cls,action):
@@ -121,4 +159,4 @@ class GameMaster():
             eval('cls.{}(action)'.format(action.phase))
         else:
             action.notes = 'ACTION NOT FOUND'
-        return action
+        return cls.get_response(cls.games[action.game_id],action)

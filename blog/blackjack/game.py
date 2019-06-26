@@ -16,6 +16,7 @@ class BlackJackGame():
         self.player_bets = {}
         self.player_done = {}
         self.winners = dict() #This has an appended value to indicate hand
+        self.game_done = False
 
     #######################################
     ## Methods for getting object values ##
@@ -38,7 +39,9 @@ class BlackJackGame():
         return list(self.players.values())
 
     def get_bet(self,player_name):
-        return self.player_bets[player_name]
+        tmp = self.player_bets[player_name]
+        logger.debug('GET BET: {} {}'.format(player_name,tmp))
+        return tmp
 
     def get_bets(self):
         return self.player_bets
@@ -191,6 +194,7 @@ class BlackJackGame():
         while self.get_dealer().get_score() < 16:
             self.get_dealer().give_card(self.deck.draw())
         self.dealer.hands[0][0].flip()
+        self.round_done = True
 
     # This is called when the player makes a move
     def process_move(self,player_name,move):
