@@ -194,6 +194,7 @@ class BlackJackGame():
         while self.get_dealer().get_score() < 16:
             self.get_dealer().give_card(self.deck.draw())
         self.dealer.hands[0][0].flip()
+        logger.debug('DEALER MOVE: {}'.format(self.get_dealer()))
         self.round_done = True
 
     # This is called when the player makes a move

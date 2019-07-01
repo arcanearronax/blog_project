@@ -31,6 +31,8 @@ class GameMaster():
                 logger.debug('get_response - test2.1')
                 resp.player_score = player.get_score()
                 logger.debug('get_response - test2.2')
+                resp.player_hand = player.get_hand()
+                resp.dealer_hand = game.ger_dealer().get_hand()
             except Exception as e:
                 logger.debug('RESPONSE ERROR: {}'.format(e))
                 return resp

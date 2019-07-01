@@ -16,8 +16,6 @@
     }
     #game-div {
       overflow: hidden;
-      background-image: url("../static/game/hand_back.jpg");
-      background-size: 100%;
       float: left;
       margin: 0px 100px 0px 100px;
     }
@@ -64,10 +62,28 @@
       position:relative;
       left:100px;
       clear: both;
+      overflow: scroll
     }
+    #game-response {
+      background-image: url("../static/game/hand_back.jpg");
+      background-size: 100%;
+      overflow: hidden; /* Used to extend the div all the way to the right */
+      color: red;
+    }
+    #game-response table {
+      background: rgba(0, 0, 0, 0.4);
+    }
+    #game-response td {
+      font-weight: bold;
+    }
+
   </style>
 
-  <body>
+  <head>
+    <link rel="stylesheet" type="text/css" href="/static/WebpageStyle.css">
+  </head>
+
+  <body class="w3-black">
     <h1>Game Template</h1>
 
     <div id="user-interface">
@@ -87,71 +103,6 @@
           </table>
           <input type="submit" value="Submit" name="BlackJackReq" id="SubmitButton">
         </form>
-      </div>
-
-      <div id="game-div">
-        {% if action.hands %}
-          <div id="player-hands-div" class="hand">
-            {% if action.hands %}
-              <h3>Player Hand</h3>
-            {% endif %}
-
-            {% for card in action.hands %}
-
-              <div class="card">
-                <div class="front">
-                  {{ card.face }}
-                  {% if card.suit == 'Spades' %}
-                    &#9824;
-                  {% elif card.suit == 'Hearts' %}
-                    &#9829;
-                  {% elif card.suit == 'Clubs' %}
-                    &#9827;
-                  {% elif card.suit == 'Diamonds' %}
-                    &#9830;
-                  {% else %}
-                    {{ card.suit }}
-                  {% endif %}
-                </div>
-              </div>
-
-            {% empty %}
-            {% endfor %}
-          </div>
-        {% endif %}
-
-        {% if action.hands %}
-          <div id="dealer-hands-div" class="hand">
-            {% if action.dealer_hand %}
-              <h3>Dealer Hand</h3>
-            {% endif %}
-
-            {% for card in action.dealer_hand %}
-
-              <div class="card">
-                {% if card.hidden %}
-                  <div class="back"></div>
-                {% else %}
-                  <div class="front">
-                    {{ card.face }}
-                    {% if card.suit == 'Spades' %}
-                      &#9824;
-                    {% elif card.suit == 'Hearts' %}
-                      &#9829;
-                    {% elif card.suit == 'Clubs' %}
-                      &#9827;
-                    {% elif card.suit == 'Diamonds' %}
-                      &#9830;
-                    {% else %}
-                      {{ card.suit }}
-                    {% endif %}
-                  </div>
-                {% endif %}
-              </div>
-            {% empty %}
-            {% endfor %}
-          </div>
-        {% endif %}
       </div>
     </div>
 
@@ -195,16 +146,81 @@
 
     <div id='game-response'>
       {% if response %}
-        <h4>Game Response</h4>
-        <table>
-          {% for attr,value in response.attrs %}
-            <tr>
-              <td>{{ attr }}:</td>
-              <td>{{ value }}</td>
-            </tr>
-          {% empty %}
-          {% endfor %}
-        </table>
+        <div id="response-info">
+          <h4>Game Response</h4>
+          <table>
+            {% for attr,value in response.attrs %}
+              <tr>
+                <td>{{ attr }}:</td>
+                <td>{{ value }}</td>
+              </tr>
+            {% empty %}
+            {% endfor %}
+          </table>
+        </div>
+
+        <div id="response-hands">
+          {% if response.player_hand %}
+            <div id="player-hands-div" class="hand">
+              <h3>Player Hand</h3>
+
+              {% for card in response.player_hand %}
+
+                <div class="card">
+                  <div class="front">
+                    {{ card.face }}
+                    {% if card.suit == 'Spades' %}
+                      &#9824;
+                    {% elif card.suit == 'Hearts' %}
+                      &#9829;
+                    {% elif card.suit == 'Clubs' %}
+                      &#9827;
+                    {% elif card.suit == 'Diamonds' %}
+                      &#9830;
+                    {% else %}
+                      {{ card.suit }}
+                    {% endif %}
+                  </div>
+                </div>
+
+              {% empty %}
+              {% endfor %}
+            </div>
+          {% endif %}
+
+          {% if response.hands %}
+            <div id="dealer-hands-div" class="hand">
+              {% if response.dealer_hand %}
+                <h3>Dealer Hand</h3>
+              {% endif %}
+
+              {% for card in response.dealer_hand %}
+
+                <div class="card">
+                  {% if card.hidden %}
+                    <div class="back"></div>
+                  {% else %}
+                    <div class="front">
+                      {{ card.face }}
+                      {% if card.suit == 'Spades' %}
+                        &#9824;
+                      {% elif card.suit == 'Hearts' %}
+                        &#9829;
+                      {% elif card.suit == 'Clubs' %}
+                        &#9827;
+                      {% elif card.suit == 'Diamonds' %}
+                        &#9830;
+                      {% else %}
+                        {{ card.suit }}
+                      {% endif %}
+                    </div>
+                  {% endif %}
+                </div>
+              {% empty %}
+              {% endfor %}
+            </div>
+          {% endif %}
+        </div>
       {% endif %}
     </div>
 

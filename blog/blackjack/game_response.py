@@ -10,7 +10,9 @@ class GameResponse():
         'player_name',
         'chip_count',
         'bet_amount',
+        'player_hand',
         'player_score',
+        'dealer_hand',
         'dealer_score',
         'result',
         'reason'
