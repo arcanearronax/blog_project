@@ -4,9 +4,9 @@ from rest_framework.response import Response
 from rest_framework.authentication import SessionAuthentication,TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
-from .models import Category, Post
+from blog.models import Category, Post
 from blog.forms import CatForm, PostForm, LoginForm
-from blog.serializers import CategorySerializer, PostSerializer, BaseSerializer
+from .serializers import CategorySerializer, PostSerializer, BaseSerializer
 from rest_framework.exceptions import APIException
 import logging
 

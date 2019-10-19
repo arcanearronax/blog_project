@@ -25,5 +25,6 @@ from . import views
 
 urlpatterns = [
 	path('', views.RestView.as_view(), name='index'),
+    re_path(r'^api/', include('blog.router')),
+    path('api-auth/',authviews.obtain_auth_token, name="api-auth"),
 ]
-

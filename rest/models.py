@@ -1,4 +1,4 @@
 from django.db import models
-from blog.blog.models import *
+#from blog.blog.models import *
 
 # Create your models here.

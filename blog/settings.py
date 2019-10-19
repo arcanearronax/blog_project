@@ -21,7 +21,7 @@ SECRET_KEY = 'qlax4%-sn$jfbxki435x2!1*w7%%mhxi5kzrc7@4(q#enlp5-5'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['blog.arcanedomain.duckdns.org','10.0.0.4','rest.arcanedomain.duckdns.org']
+ALLOWED_HOSTS = ['blog.arcanedomain.duckdns.org','10.0.0.4']
 
 
 # Application definition
@@ -34,8 +34,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'blog.apps.BlogConfig',
-    'rest_framework',
-    'rest_framework.authtoken',
 ]
 
 MIDDLEWARE = [
@@ -66,17 +64,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'rest.wsgi.application'
-
-REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework.authentication.TokenAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
-    ),
-    'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated',
-    ),
-}
+WSGI_APPLICATION = 'blog.wsgi.application'
 
 DATABASES = {
     'default': {

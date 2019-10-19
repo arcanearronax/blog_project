@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import ModelForm, Textarea
-from .models import Post, Category
+from blog.models import Post, Category
 
 class PostForm(forms.ModelForm):
     class Meta:
