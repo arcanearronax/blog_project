@@ -1,6 +1,6 @@
-blog/__pycache__
-blog/migrations
-blog/wsgi.py
+*/__pycache__
+*/migrations
+*/wsgi.py
 
 static/javascript/ckeditor/*
 

@@ -16,12 +16,13 @@ import os
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'qlax4%-sn$jfbxki435x2!1*w7%%mhxi5kzrc7@4(q#enlp5-5'
+SECRET_KEY = os.environ.get('SKEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['blog.arcanedomain.duckdns.org','10.0.0.4','rest.arcanedomain.duckdns.org']
+ALLOWED_HOSTS = [os.environ.get('AHOST'),os.environ.get('BHOST')]
+
 
 
 # Application definition
@@ -33,9 +34,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'blog.apps.BlogConfig',
-    'rest_framework',
-    'rest_framework.authtoken',
+	'rest.apps.RestConfig',
 ]
 
 MIDDLEWARE = [
@@ -48,7 +47,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'blog.urls'
+ROOT_URLCONF = 'rest.urls'
 
 TEMPLATES = [
     {
@@ -68,22 +67,12 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'rest.wsgi.application'
 
-REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework.authentication.TokenAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
-    ),
-    'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated',
-    ),
-}
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'blog',
-		'USER': 'webmaster',
-		'PASSWORD': 'Dexter313!',
+		'USER': os.environ.get('userName'),
+		'PASSWORD': os.environ.get('userPass'),
 		'HOST': 'localhost',
 		'PORT': '',
     }
